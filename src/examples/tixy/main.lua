@@ -44,7 +44,6 @@ function advance()
   load_example(e)
   if ex_idx < #examples then
     ex_idx = ex_idx + 1
-    time = 0
   end
 end
 
@@ -53,7 +52,6 @@ function retreat()
     local e = examples[ex_idx]
     load_example(e)
     ex_idx = ex_idx - 1
-    time = 0
   end
 end
 
@@ -96,6 +94,7 @@ function setupTixy()
   local f = loadstring(code)
   if f then
     setfenv(f, _G)
+    time = 0
     tixy = f()
   end
 end
