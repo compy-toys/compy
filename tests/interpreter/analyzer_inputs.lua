@@ -1,7 +1,7 @@
 --- @param s str
---- @param defs Assignment[]
+--- @param semi SemanticInfo
 --- @return table {string[], string[]}
-local prep = function(s, defs)
+local prep = function(s, semi)
   local orig = (function()
     if type(s) == 'string' then
       return string.lines(s)
@@ -14,7 +14,7 @@ local prep = function(s, defs)
     end
   end)()
 
-  return { orig, defs }
+  return { orig, semi }
 end
 
 local table1 = prep({
@@ -30,7 +30,7 @@ local table1 = prep({
   ' z = 2,',
   ' 3,',
   '}',
-}, {
+}, SemanticInfo({
   { name = 't',     line = 1,  type = 'local' },
   { name = 't.ty',  line = 2,  type = 'field' },
   { name = 't2',    line = 4,  type = 'global' },
@@ -38,13 +38,13 @@ local table1 = prep({
   { name = 't2.w2', line = 6,  type = 'field' },
   { name = 'a',     line = 8,  type = 'global' },
   { name = 'a.z',   line = 10, type = 'field' },
-})
+}, {}))
 local table2 = prep({
   'tmp = {}',
   'tmp[1] = 2',
-}, {
+}, SemanticInfo({
   { name = 'tmp', line = 1, type = 'global' }
-})
+}, {}))
 
 local simple = {
   --- sets
@@ -53,21 +53,22 @@ local simple = {
     'y = 3',
     'x = 3',
     'w, ww = 10, 11',
-  }, {
+  }, SemanticInfo({
     { line = 1, name = 'x',  type = 'global', },
     { line = 2, name = 'y',  type = 'global', },
     { line = 3, name = 'x',  type = 'global', },
     { line = 4, name = 'w',  type = 'global', },
     { line = 4, name = 'ww', type = 'global', },
-  }),
+  }, {})),
+
   prep({
     'local l = 1',
     'local x, y = 2, 3',
-  }, {
+  }, SemanticInfo({
     { line = 1, name = 'l', type = 'local', },
     { line = 2, name = 'x', type = 'local', },
     { line = 2, name = 'y', type = 'local', },
-  }),
+  }, {})),
   --- tables
   table1,
   -- table2,
@@ -75,35 +76,35 @@ local simple = {
   prep({
     'function drawBackground()',
     'end',
-  }, {
+  }, SemanticInfo({
     { line = 1, name = 'drawBackground', type = 'function', },
-  }),
+  }, {})),
   prep({
     'function love.draw()',
     '  draw()',
     'end',
-  }, {
+  }, SemanticInfo({
     { line = 1, name = 'love.draw', type = 'function', },
-  }),
+  }, {})),
   prep({
     'function love.handlers.keypressed()',
     'end',
-  }, {
+  }, SemanticInfo({
     { line = 1, name = 'love.handlers.keypressed', type = 'function', },
-  }),
+  }, {})),
   prep({
     'local function drawBody()',
     'end',
-  }, {
+  }, SemanticInfo({
     { name = 'drawBody', line = 1, type = 'function' }
-  }),
+  }, {})),
   --- methods
   prep({
     'function M:draw()',
     'end',
-  }, {
+  }, SemanticInfo({
     { name = 'M:draw', line = 1, type = 'method' }
-  }),
+  }, {})),
 }
 
 local sierpinski = [[function sierpinski(depth)
@@ -295,14 +296,14 @@ end
 ]]
 
 local full = {
-  prep(sierpinski, {
+  prep(sierpinski, SemanticInfo({
     { line = 1,  name = 'sierpinski', type = 'function', },
     { line = 2,  name = 'lines',      type = 'global', },
     { line = 4,  name = 'sp',         type = 'global', },
     { line = 5,  name = 'tmp',        type = 'global', },
     { line = 10, name = 'lines',      type = 'global', },
-  }),
-  prep(clock, {
+  }, {})),
+  prep(clock, SemanticInfo({
     { line = 1,  name = 'love.draw',        type = 'function', },
     { line = 5,  name = 'love.update',      type = 'function', },
     { line = 6,  name = 't',                type = 'global', },
@@ -312,8 +313,8 @@ local full = {
     { line = 16, name = 'love.keyreleased', type = 'function', },
     { line = 19, name = 'bg_color',         type = 'global', },
     { line = 21, name = 'color',            type = 'global', },
-  }),
-  prep(meta, {
+  }, {})),
+  prep(meta, SemanticInfo({
     { line = 3,  name = 'M:extract_comments', type = 'method', },
     { line = 4,  name = 'lfi',                type = 'local', },
     { line = 5,  name = 'lla',                type = 'local', },
@@ -346,8 +347,8 @@ local full = {
     { line = 32, name = 'li.multiline',       type = 'field', },
     { line = 33, name = 'li.position',        type = 'field', },
     { line = 34, name = 'li.prepend_newline', type = 'field', },
-  }),
-  prep(fullclock, {
+  }, {})),
+  prep(fullclock, SemanticInfo({
     { line = 2,  name = 'width',            type = 'global', },
     { line = 2,  name = 'height',           type = 'global', },
     { line = 3,  name = 'midx',             type = 'global', },
@@ -386,7 +387,8 @@ local full = {
     { line = 69, name = 'bg_color',         type = 'global', },
     { line = 71, name = 'color',            type = 'global', },
     { line = 75, name = 'love.keyreleased', type = 'function', },
-  }),
+  }, {})),
+}
 }
 
 return {

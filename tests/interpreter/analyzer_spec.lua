@@ -96,7 +96,7 @@ describe('analyzer #analyzer', function()
               ---@diagnostic disable-next-line: param-type-mismatch
               local semDB = analyzer.analyze(r)
               it('matches ' .. i, function()
-                assert.same(output, semDB.assignments)
+                assert.same(output, semDB)
               end)
             else
               Log.warn('syntax error in input #' .. i)
