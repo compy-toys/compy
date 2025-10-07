@@ -1,7 +1,6 @@
-require("action")
+actions = require("action")
 require("drawing")
 
-gfx = love.graphics
 width, height = gfx.getDimensions()
 midx = width / 2
 midy = height / 2

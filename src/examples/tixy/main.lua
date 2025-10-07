@@ -4,7 +4,7 @@ cw, ch = gfx.getDimensions()
 midx = cw / 2
 
 require("math")
-require("examples")
+examples = require("examples")
 
 size = 28
 spacing = 3

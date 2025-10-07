@@ -1,4 +1,4 @@
-examples = {}
+local examples = {}
 
 function example(c, l)
   table.insert(examples, {
@@ -98,3 +98,5 @@ example(
   "return (x-5)^2 + (y-5)^2 - 99*sin(t)",
   "create your own!"
 )
+
+return examples

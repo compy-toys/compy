@@ -18,7 +18,7 @@ function pause(msg)
   pause(msg or "user paused the game")
 end
 
-actions = {
+local actions = {
   forward = moveForward,
   fd = moveForward,
   back = moveBack,
@@ -29,3 +29,5 @@ actions = {
   r = moveRight,
   pause = pause
 }
+
+return actions
