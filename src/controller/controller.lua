@@ -420,11 +420,11 @@ Controller = {
     View.prev_draw = love.draw
     View.main_draw = love.draw
     View.end_draw = function()
-      local w, h = G.getDimensions()
-      G.setColor(Color[Color.white])
-      G.setFont(C.cfg.view.font)
-      G.clear()
-      G.printf(messages.exit_anykey, 0, h / 3, w, "center")
+      local w, h = gfx.getDimensions()
+      gfx.setColor(Color[Color.white])
+      gfx.setFont(C.cfg.view.font)
+      gfx.clear()
+      gfx.printf(messages.exit_anykey, 0, h / 3, w, "center")
     end
   end,
 

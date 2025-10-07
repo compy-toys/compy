@@ -1,4 +1,4 @@
-width, height = G.getDimensions()
+width, height = gfx.getDimensions()
 --- color palette
 block_w = width / 10
 block_h = block_w / 2
@@ -29,7 +29,7 @@ weights = { 1, 2, 4, 5, 6, 9, 11, 13 }
 --- canvas
 can_w = width - box_w
 can_h = height - pal_h - 1
-canvas = G.newCanvas(can_w, can_h)
+canvas = gfx.newCanvas(can_w, can_h)
 
 --- selected
 color = 0    -- black
@@ -55,42 +55,42 @@ function inWeightRange(x, y)
 end
 
 function drawBackground()
-  G.setColor(Color[Color.black])
-  G.rectangle("fill", 0, 0, width, height)
+  gfx.setColor(Color[Color.black])
+  gfx.rectangle("fill", 0, 0, width, height)
 end
 
 function drawPaletteOutline(y)
-  G.setColor(Color[bg_color])
-  G.rectangle("fill", 0, y - block_h, block_w * 2, block_h * 2)
-  G.setColor(Color[Color.white])
-  G.rectangle("line", 0, y - block_h, sel_w, pal_h)
-  G.rectangle("line", sel_w, y - block_h, width, pal_h)
+  gfx.setColor(Color[bg_color])
+  gfx.rectangle("fill", 0, y - block_h, block_w * 2, block_h * 2)
+  gfx.setColor(Color[Color.white])
+  gfx.rectangle("line", 0, y - block_h, sel_w, pal_h)
+  gfx.rectangle("line", sel_w, y - block_h, width, pal_h)
 end
 
 function drawSelectedColor(y)
-  G.setColor(Color[color])
-  G.rectangle("fill", block_w / 2, y - (block_h / 2),
+  gfx.setColor(Color[color])
+  gfx.rectangle("fill", block_w / 2, y - (block_h / 2),
     block_w, block_h)
   -- outline
   local line_color = Color.white + Color.bright
   if color == line_color then
     line_color = Color.black
   end
-  G.setColor(Color[line_color])
-  G.rectangle("line", block_w / 2, y - (block_h / 2),
+  gfx.setColor(Color[line_color])
+  gfx.rectangle("line", block_w / 2, y - (block_h / 2),
     block_w, block_h)
 end
 
 function drawColorBoxes(y)
   for c = 0, 7 do
     local x = block_w * (c + 2)
-    G.setColor(Color[c])
-    G.rectangle("fill", x, y, width, block_h)
-    G.setColor(Color[c + 8])
-    G.rectangle("fill", x, y - block_h, width, block_h)
-    G.setColor(Color[Color.white])
-    G.rectangle("line", x, y, width, block_h)
-    G.rectangle("line", x, y - block_h, width, block_h)
+    gfx.setColor(Color[c])
+    gfx.rectangle("fill", x, y, width, block_h)
+    gfx.setColor(Color[c + 8])
+    gfx.rectangle("fill", x, y - block_h, width, block_h)
+    gfx.setColor(Color[Color.white])
+    gfx.rectangle("line", x, y, width, block_h)
+    gfx.rectangle("line", x, y - block_h, width, block_h)
   end
 end
 
@@ -102,31 +102,31 @@ function drawColorPalette()
 end
 
 function drawBrush(cx, cy)
-  G.push()
-  G.translate(cx, cy)
+  gfx.push()
+  gfx.translate(cx, cy)
   local s = icon_d / 100 * .8
-  G.scale(s, s)
-  G.rotate(math.pi / 4) -- 45 degree rotation
+  gfx.scale(s, s)
+  gfx.rotate(math.pi / 4) -- 45 degree rotation
 
   -- Draw the brush handle (wooden brown color)
-  G.setColor(0.6, 0.4, 0.2)
-  G.rectangle("fill", -8, -80, 16, 60)
+  gfx.setColor(0.6, 0.4, 0.2)
+  gfx.rectangle("fill", -8, -80, 16, 60)
 
   -- Handle highlight
-  G.setColor(0.8, 0.6, 0.4)
-  G.rectangle("fill", -6, -75, 3, 50)
+  gfx.setColor(0.8, 0.6, 0.4)
+  gfx.rectangle("fill", -6, -75, 3, 50)
 
   -- Metal ferrule
-  G.setColor(0.7, 0.7, 0.8)
-  G.rectangle("fill", -10, -25, 20, 12)
+  gfx.setColor(0.7, 0.7, 0.8)
+  gfx.rectangle("fill", -10, -25, 20, 12)
 
   -- Ferrule shine
-  G.setColor(0.9, 0.9, 1.0)
-  G.rectangle("fill", -8, -24, 3, 10)
+  gfx.setColor(0.9, 0.9, 1.0)
+  gfx.rectangle("fill", -8, -24, 3, 10)
 
   -- Bristles with smooth flame-shaped tip
-  G.setColor(0.2, 0.2, 0.2)
-  G.rectangle("fill", -12, -13, 24, 25)
+  gfx.setColor(0.2, 0.2, 0.2)
+  gfx.rectangle("fill", -12, -13, 24, 25)
 
   -- Create flame tip using bezier curve
   local curve = love.math.newBezierCurve(
@@ -140,38 +140,38 @@ function drawBrush(cx, cy)
   )
 
   local points = curve:render()
-  G.polygon("fill", points)
+  gfx.polygon("fill", points)
 
-  G.pop()
+  gfx.pop()
 end
 
 function drawEraser(cx, cy)
-  G.push()
-  G.translate(cx, cy)
+  gfx.push()
+  gfx.translate(cx, cy)
   local s = icon_d / 100
-  G.scale(s, s)
-  G.rotate(math.pi / 4) -- 45 degree rotation
+  gfx.scale(s, s)
+  gfx.rotate(math.pi / 4) -- 45 degree rotation
 
   -- Main eraser body (light blue)
-  G.setColor(Color[Color.white])
-  G.rectangle("fill", -12, -40, 24, 60)
+  gfx.setColor(Color[Color.white])
+  gfx.rectangle("fill", -12, -40, 24, 60)
 
   -- Blue stripes running lengthwise (darker blue)
-  G.setColor(Color[Color.blue])
-  G.rectangle("fill", -12, -40, 6, 60)
-  G.rectangle("fill", 6, -40, 6, 60)
+  gfx.setColor(Color[Color.blue])
+  gfx.rectangle("fill", -12, -40, 6, 60)
+  gfx.rectangle("fill", 6, -40, 6, 60)
 
   -- Worn eraser tip (slightly darker)
-  G.setColor(Color[Color.white + Color.bright])
-  G.rectangle("fill", -12, 15, 24, 8)
+  gfx.setColor(Color[Color.white + Color.bright])
+  gfx.rectangle("fill", -12, 15, 24, 8)
 
   -- Eraser crumbs
-  G.setColor(Color[Color.white])
-  G.circle("fill", 18, 25, 2)
-  G.circle("fill", 22, 30, 1.5)
-  G.circle("fill", 15, 32, 1)
+  gfx.setColor(Color[Color.white])
+  gfx.circle("fill", 18, 25, 2)
+  gfx.circle("fill", 22, 30, 1.5)
+  gfx.circle("fill", 15, 32, 1)
 
-  G.pop()
+  gfx.pop()
 end
 
 -- this is a color
@@ -187,14 +187,14 @@ function drawTools()
     local x = tool_midx - tb_half
     local y = (i - 1) * (m_2 + tb)
     if i == tool then
-      G.setColor(Color[Color.black])
+      gfx.setColor(Color[Color.black])
     else
-      G.setColor(Color[Color.white + Color.bright])
+      gfx.setColor(Color[Color.white + Color.bright])
     end
-    G.rectangle("fill", x, y + m_2, tb, tb)
+    gfx.rectangle("fill", x, y + m_2, tb, tb)
 
-    G.setColor(Color[Color.black])
-    G.rectangle("line", x, y + m_2, tb, tb)
+    gfx.setColor(Color[Color.black])
+    gfx.rectangle("line", x, y + m_2, tb, tb)
 
     local draw = tools[i]
     draw(tool_midx - m_2, y + tb_half + m_4)
@@ -202,20 +202,20 @@ function drawTools()
 end
 
 function drawWeightSelector()
-  G.setColor(Color[Color.white + Color.bright])
-  G.rectangle("line", 0, box_h - weight_h, box_w - 1, weight_h)
+  gfx.setColor(Color[Color.white + Color.bright])
+  gfx.rectangle("line", 0, box_h - weight_h, box_w - 1, weight_h)
   local h = (weight_h - (2 * margin)) / 8
   local w = marg_l
   for i = 0, 7 do
     local y = wb_y + margin + (i * h)
     local lw = i + 1
     local mid = y + (h / 2)
-    G.setColor(Color[Color.white + Color.bright])
-    G.rectangle("fill", margin, y, w, h)
+    gfx.setColor(Color[Color.white + Color.bright])
+    gfx.rectangle("fill", margin, y, w, h)
     if lw == weight then
-      -- G.setColor(Color[Color.white])
-      -- G.rectangle("fill", margin, y, w, h)
-      G.setColor(goose)
+      -- gfx.setColor(Color[Color.white])
+      -- gfx.rectangle("fill", margin, y, w, h)
+      gfx.setColor(goose)
       local rx1 = 3 * margin
       local rx2 = 5 * margin
       local ry1 = mid - margin
@@ -224,7 +224,7 @@ function drawWeightSelector()
       local x2 = 7 * margin
       local y1 = mid - m_2
       local y2 = mid + m_2
-      G.polygon("fill",
+      gfx.polygon("fill",
         -- body
         rx2, ry1,
         rx1, ry1,
@@ -235,9 +235,9 @@ function drawWeightSelector()
         x2, mid,
         x1, y1
       )
-      G.setColor(Color[Color.black])
-      G.setLineWidth(2)
-      G.polygon("line",
+      gfx.setColor(Color[Color.black])
+      gfx.setLineWidth(2)
+      gfx.polygon("line",
         -- body
         rx2, ry1,
         rx1, ry1,
@@ -248,22 +248,22 @@ function drawWeightSelector()
         x2, mid,
         x1, y1
       )
-      G.setLineWidth(1)
+      gfx.setLineWidth(1)
     else
     end
-    G.setColor(Color[Color.black])
+    gfx.setColor(Color[Color.black])
     local aw = weights[lw]
-    G.rectangle("fill", box_w / 3, mid - (aw / 2),
+    gfx.rectangle("fill", box_w / 3, mid - (aw / 2),
       box_w / 2, aw)
   end
 end
 
 function drawToolbox()
   --- outline
-  G.setColor(Color[Color.white])
-  G.rectangle("fill", 0, 0, box_w - 1, height - pal_h)
-  G.setColor(Color[Color.white + Color.bright])
-  G.rectangle("line", 0, 0, box_w - 1, box_h)
+  gfx.setColor(Color[Color.white])
+  gfx.rectangle("fill", 0, 0, box_w - 1, height - pal_h)
+  gfx.setColor(Color[Color.white + Color.bright])
+  gfx.rectangle("line", 0, 0, box_w - 1, box_h)
   drawTools()
   drawWeightSelector()
 end
@@ -282,8 +282,8 @@ function drawTarget()
   local x, y = love.mouse.getPosition()
   if inCanvasRange(x, y) then
     local aw = getWeight()
-    G.setColor(Color[Color.white])
-    G.circle("line", x, y, aw)
+    gfx.setColor(Color[Color.white])
+    gfx.circle("line", x, y, aw)
   end
 end
 
@@ -291,7 +291,7 @@ function love.draw()
   drawBackground()
   drawToolbox()
   drawColorPalette()
-  G.draw(canvas, box_w)
+  gfx.draw(canvas, box_w)
   drawTarget()
 end
 
@@ -327,14 +327,14 @@ function useCanvas(x, y, btn)
   canvas:renderTo(function()
     if btn == 1 then
       if tool == 1 then
-        G.setColor(Color[color])
+        gfx.setColor(Color[color])
       elseif tool == 2 then
-        G.setColor(Color[bg_color])
+        gfx.setColor(Color[bg_color])
       end
     elseif btn == 2 then
-      G.setColor(Color[bg_color])
+      gfx.setColor(Color[bg_color])
     end
-    G.circle("fill", x - box_w, y, aw)
+    gfx.circle("fill", x - box_w, y, aw)
   end)
 end
 

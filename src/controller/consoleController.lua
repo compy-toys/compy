@@ -88,11 +88,11 @@ end
 --- @return boolean success
 --- @return string? errmsg
 local function run_user_code(f, cc, project_path)
-  local G = love.graphics
+  local gfx = love.graphics
   local output = cc.model.output
   local env = cc:get_base_env()
 
-  G.setCanvas(cc:get_canvas())
+  gfx.setCanvas(cc:get_canvas())
   local ok, call_err
   if project_path then
     env = cc:get_project_env()
@@ -102,7 +102,7 @@ local function run_user_code(f, cc, project_path)
     cc.main_ctrl.set_user_handlers(env['love'])
   end
   output:restore_main()
-  G.setCanvas()
+  gfx.setCanvas()
   if not ok then
     local msg = LANG.get_call_error(call_err)
     return false, msg
@@ -209,7 +209,7 @@ end
 
 function ConsoleController.prepare_env(cc)
   local prepared            = cc.main_env
-  prepared.G                = love.graphics
+  prepared.gfx              = love.graphics
 
   local P                   = cc.model.projects
 
@@ -343,7 +343,7 @@ function ConsoleController.prepare_project_env(cc)
   local cfg                   = cc.model.cfg
   ---@type table
   local project_env           = cc:get_pre_env_c()
-  project_env.G               = love.graphics
+  project_env.gfx      = love.graphics
 
   project_env.require         = function(name)
     return project_require(cc, name)

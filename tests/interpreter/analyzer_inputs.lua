@@ -210,7 +210,7 @@ end
 
 local fullclock = [[
 --- @diagnostic disable: duplicate-set-field,lowercase-global
-width, height = G.getDimensions()
+width, height = gfx.getDimensions()
 midx = width / 2
 midy = height / 2
 
@@ -232,7 +232,7 @@ s = 0
 math.randomseed(os.time())
 color = math.random(7)
 bg_color = math.random(7)
-font = G.newFont(72)
+font = gfx.newFont(72)
 
 local function pad(i)
   return string.format("%02d", i)
@@ -249,15 +249,15 @@ function getTimestamp()
 end
 
 function love.draw()
-  G.setColor(Color[color + Color.bright])
-  G.setBackgroundColor(Color[bg_color])
-  G.setFont(font)
+  gfx.setColor(Color[color + Color.bright])
+  gfx.setBackgroundColor(Color[bg_color])
+  gfx.setFont(font)
 
   local text = getTimestamp()
   local l = string.len(text)
   local off_x = l * font:getWidth(' ')
   local off_y = font:getHeight() / 2
-  G.print(text, midx - off_x, midy - off_y, 0, 1, 1)
+  gfx.print(text, midx - off_x, midy - off_y, 0, 1, 1)
 end
 
 function love.update(dt)

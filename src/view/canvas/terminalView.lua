@@ -1,4 +1,4 @@
-local G = love.graphics
+local gfx = love.graphics
 
 --- @class TerminalView
 TerminalView = {}
@@ -10,11 +10,11 @@ local function terminal_draw(terminal, canvas, overlay)
       terminal.char_width, terminal.char_height
 
   -- if terminal.dirty or overlay then
-  G.push('all')
+  gfx.push('all')
 
-  G.setCanvas(canvas)
-  G.setFont(terminal.font)
-  G.clear(terminal.clear_color_alpha)
+  gfx.setCanvas(canvas)
+  gfx.setFont(terminal.font)
+  gfx.clear(terminal.clear_color_alpha)
   local font_height = terminal.font:getHeight()
 
   for y, row in ipairs(terminal.buffer) do
@@ -41,33 +41,33 @@ local function terminal_draw(terminal, canvas, overlay)
 
       -- Character background
       if not overlay then
-        G.setColor(unpack(bg))
-        G.rectangle("fill",
+        gfx.setColor(unpack(bg))
+        gfx.rectangle("fill",
           left, top + (font_height - char_height),
           char_width, char_height)
       end
 
-      local bm, am = G.getBlendMode()
-      G.setBlendMode('alpha', "alphamultiply")
+      local bm, am = gfx.getBlendMode()
+      gfx.setBlendMode('alpha', "alphamultiply")
       -- Character
-      G.setColor(unpack(fg))
-      G.print(char, left, top)
+      gfx.setColor(unpack(fg))
+      gfx.print(char, left, top)
 
-      G.setBlendMode(bm, am)
+      gfx.setBlendMode(bm, am)
 
       state.dirty = false
       -- end
     end
   end
   terminal.dirty = false
-  G.pop()
+  gfx.pop()
   -- end
 
 
   if terminal.show_cursor then
-    G.setFont(terminal.font)
+    gfx.setFont(terminal.font)
     if love.timer.getTime() % 1 > 0.5 then
-      G.print("_",
+      gfx.print("_",
         (terminal.cursor_x - 1) * char_width,
         (terminal.cursor_y - 1) * char_height)
     end
@@ -76,15 +76,15 @@ end
 
 --- @param terminal table
 function TerminalView.draw(terminal, canvas, snapshot)
-  G.setCanvas()
-  G.push('all')
+  gfx.setCanvas()
+  gfx.push('all')
 
   if snapshot then
     terminal_draw(terminal, canvas, true)
   else
     terminal_draw(terminal, canvas)
   end
-  G.draw(canvas)
-  G.setBlendMode('alpha') -- default
-  G.pop()
+  gfx.draw(canvas)
+  gfx.setBlendMode('alpha') -- default
+  gfx.pop()
 end

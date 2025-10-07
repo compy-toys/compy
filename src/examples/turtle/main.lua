@@ -1,7 +1,8 @@
 require("action")
 require("drawing")
 
-width, height = love.graphics.getDimensions()
+gfx = love.graphics
+width, height = gfx.getDimensions()
 midx = width / 2
 midy = height / 2
 incr = 10
@@ -19,7 +20,7 @@ function eval(input)
 end
 
 function love.draw()
-  G.setFont(font)
+  gfx.setFont(font)
   drawBackground()
   drawHelp()
   drawTurtle(tx, ty)

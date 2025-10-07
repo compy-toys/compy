@@ -10,7 +10,7 @@ We have used the screen size before, but only in a very limited capacity, to det
 
 ```lua
 cell_size = 10
-screen_w, screen_h = G.getDimensions()
+screen_w, screen_h = gfx.getDimensions()
 grid_w = screen_w / cell_size
 grid_h = screen_h / cell_size
 ```
@@ -250,10 +250,10 @@ function drawHelp()
   local right_edge = screen_w - margin
   local reset_msg = "Reset: [r] key or long press"
   local speed_msg = "Set speed: [+]/[-] key or drag up/down"
-  G.print(reset_msg, margin, (bottom - fh) - fh)
-  G.print(speed_msg, margin, bottom - fh)
+  gfx.print(reset_msg, margin, (bottom - fh) - fh)
+  gfx.print(speed_msg, margin, bottom - fh)
   local speed_label = string.format("Speed: %02d", speed)
   local label_w = font:getWidth(speed_label)
-  G.print(speed_label, right_edge - label_w, bottom - fh)
+  gfx.print(speed_label, right_edge - label_w, bottom - fh)
 end
 ```

@@ -132,14 +132,14 @@ end
 
 ```lua
 function drawCircle(color, radius, x, y)
-  G.setColor(color)
-  G.circle(
+  gfx.setColor(color)
+  gfx.circle(
     "fill",
     x * (size + spacing) + offset,
     y * (size + spacing) + offset,
     radius
   )
-  G.circle(
+  gfx.circle(
     "line",
     x * (size + spacing) + offset,
     y * (size + spacing) + offset,

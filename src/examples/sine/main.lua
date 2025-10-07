@@ -1,20 +1,20 @@
-local G = love.graphics
+local gfx = love.graphics
 
 local x0 = 0
-local xe = G.getWidth()
+local xe = gfx.getWidth()
 local y0 = 0
-local ye = G.getHeight()
+local ye = gfx.getHeight()
 
 local xh = xe / 2
 local yh = ye / 2
 
-G.setColor(1, 1, 1, 0.5)
-G.setLineWidth(1)
-G.line(xh, y0, xh, ye)
-G.line(x0, yh, xe, yh)
+gfx.setColor(1, 1, 1, 0.5)
+gfx.setLineWidth(1)
+gfx.line(xh, y0, xh, ye)
+gfx.line(x0, yh, xe, yh)
 
-G.setColor(1, 0, 0)
-G.setPointSize(2)
+gfx.setColor(1, 0, 0)
+gfx.setPointSize(2)
 
 local amp = 100
 local times = 2
@@ -27,4 +27,4 @@ for x = 0, xe do
   table.insert(points, y)
 end
 
-G.points(points)
+gfx.points(points)

@@ -15,7 +15,7 @@ local FS = require("util.filesystem")
 
 require("lib.error_explorer")
 
-G = love.graphics
+local gfx = love.graphics
 
 local messages = {
   how_to_exit = 'Press Ctrl-Esc to exit',
@@ -45,11 +45,11 @@ local config_view = function(flags)
 
   local font_dir = "assets/fonts/"
   local mf = "ubuntu_mono_bold_nerd.ttf"
-  local font_main = G.newFont(
+  local font_main = gfx.newFont(
     font_dir .. mf, font_size)
-  local font_icon = G.newFont(
+  local font_icon = gfx.newFont(
     font_dir .. "SFMonoNerdFontMono-Regular.otf", font_size)
-  local font_cjk = G.newFont(
+  local font_cjk = gfx.newFont(
     font_dir .. "SarasaGothicJ-Bold.ttf", font_size * (2 / 3))
   font_main:setFallbacks(font_icon, font_cjk)
 
@@ -64,9 +64,9 @@ local config_view = function(flags)
   local lines = 16
   local input_max = 14
 
-  local font_labels = G.newFont(font_dir .. mf, 12)
-  local w = love.fixWidth or G.getWidth()
-  local h = love.fixHeight or G.getHeight()
+  local font_labels = gfx.newFont(font_dir .. mf, 12)
+  local w = love.fixWidth or gfx.getWidth()
+  local h = love.fixHeight or gfx.getHeight()
   local eh = h - 2 * fh
   local debugheight = math.floor(eh / (love.test_grid_y * fh))
   local debugwidth = math.floor(w / love.test_grid_x) / fw

@@ -4,7 +4,7 @@ require("util.view")
 local class = require('util.class')
 local Terminal = require("lib.terminal")
 
-local G = love.graphics
+local gfx = love.graphics
 
 --- @class CanvasModel
 --- @field terminal table
@@ -31,7 +31,7 @@ function CanvasModel.new(cfg)
     -- h = ViewUtils.get_drawable_height(cfg.view)
     h = cfg.view.h
   end
-  local canvas = G.newCanvas(w, h)
+  local canvas = gfx.newCanvas(w, h)
   local custom_height = cfg.view.fh * cfg.view.lh
   local term = Terminal(w, h, cfg.view.font,
     nil, custom_height)
@@ -85,14 +85,14 @@ end
 
 function CanvasModel:clear_canvas()
   return self.canvas:renderTo(function()
-    G.clear(0, 0, 0, 0)
+    gfx.clear(0, 0, 0, 0)
   end)
 end
 
 function CanvasModel:draw_to()
-  G.setCanvas(self.canvas)
+  gfx.setCanvas(self.canvas)
 end
 
 function CanvasModel:restore_main()
-  G.setCanvas()
+  gfx.setCanvas()
 end

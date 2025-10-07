@@ -42,7 +42,7 @@ Building on the 16-color theme, we will divide the screen into 10 columns (8 col
 Then halve these columns to get the row height. Display the selected background on a double block, with the foreground color in the middle.
 
 ```lua
-width, height = G.getDimensions()
+width, height = gfx.getDimensions()
 --- color palette
 block_w = width / 10
 block_h = block_w / 2
@@ -142,13 +142,13 @@ In our case, we are only interested in the whole number to navigate our grid, an
   local y = height - block_h
   for c = 0, 7 do
     local x = block_w * (c + 2)
-    G.setColor(Color[c])
-    G.rectangle("fill", x, y, width, block_h)
-    G.setColor(Color[c + 8])
-    G.rectangle("fill", x, y - block_h, width, block_h)
-    G.setColor(Color[Color.white])
-    G.rectangle("line", x, y, width, block_h)
-    G.rectangle("line", x, y - block_h, width, block_h)
+    gfx.setColor(Color[c])
+    gfx.rectangle("fill", x, y, width, block_h)
+    gfx.setColor(Color[c + 8])
+    gfx.rectangle("fill", x, y - block_h, width, block_h)
+    gfx.setColor(Color[Color.white])
+    gfx.rectangle("line", x, y, width, block_h)
+    gfx.rectangle("line", x, y - block_h, width, block_h)
   end
 ```
 
@@ -163,7 +163,7 @@ Let's see how this works. First, we set up the canvas:
 ```lua
 can_w = width - box_w
 can_h = height - pal_h - 1
-canvas = G.newCanvas(can_w, can_h)
+canvas = gfx.newCanvas(can_w, can_h)
 ```
 
 The default size of a canvas would be equivalent to the screen, but we have some UI elements here, so a bit smaller makes more sense. However, this does mean we need to calculate the offsets properly when detecting clicks and displaying it.
@@ -177,12 +177,12 @@ function useCanvas(x, y, btn)
   local aw = getWeight()
   canvas:renderTo(function()
     -- ...
-    G.circle("fill", x - box_w, y, aw)
+    gfx.circle("fill", x - box_w, y, aw)
   end)
 end
 ```
 
-Note the _x_ coordinate, which is offset by `box_w` (the width of the side panel). When drawing, we go the opposite direction: `G.draw(canvas, box_w)`.
+Note the _x_ coordinate, which is offset by `box_w` (the width of the side panel). When drawing, we go the opposite direction: `gfx.draw(canvas, box_w)`.
 
 ### Click detection
 

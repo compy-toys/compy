@@ -21,8 +21,8 @@ end
 --- @param cfg ViewConfig
 local write_line = function(l, str, y, breaks, cfg)
   local dy = y - (-l + 1 + breaks) * cfg.fh
-  G.setFont(cfg.font)
-  G.print(str, 0, dy)
+  gfx.setFont(cfg.font)
+  gfx.print(str, 0, dy)
 end
 
 --- Write a token to output
@@ -34,17 +34,17 @@ end
 --- @param selected boolean
 local write_token = function(dy, dx, token,
                              color, bgcolor, selected)
-  G.push('all')
+  gfx.push('all')
   if selected then
-    G.setColor(color)
+    gfx.setColor(color)
     local back = string.rep('█', string.ulen(token))
-    G.print(back, dx, dy)
-    G.setColor(bgcolor)
+    gfx.print(back, dx, dy)
+    gfx.setColor(bgcolor)
   else
-    G.setColor(color)
+    gfx.setColor(color)
   end
-  G.print(token, dx, dy)
-  G.pop()
+  gfx.print(token, dx, dy)
+  gfx.pop()
 end
 
 --- Hide elements for debugging
@@ -73,61 +73,61 @@ BlendMode = Alpha AlphaMode
 local blendModes = {
   { -- 1
     name = 'Alpha AlphaM',
-    blend = function() G.setBlendMode('alpha', "alphamultiply") end
+    blend = function() gfx.setBlendMode('alpha', "alphamultiply") end
   },
   { -- 2
     name = 'Alpha PreM',
-    blend = function() G.setBlendMode('alpha', "premultiplied") end
+    blend = function() gfx.setBlendMode('alpha', "premultiplied") end
   },
   -- add
   {
     name = 'Add AlphaM',
-    blend = function() G.setBlendMode('add', "alphamultiply") end
+    blend = function() gfx.setBlendMode('add', "alphamultiply") end
   },
   {
     name = 'Add PreM',
-    blend = function() G.setBlendMode('add', "premultiplied") end
+    blend = function() gfx.setBlendMode('add', "premultiplied") end
   },
   -- subtract
   {
     name = 'Subtract AlphaM',
-    blend = function() G.setBlendMode('subtract', "alphamultiply") end
+    blend = function() gfx.setBlendMode('subtract', "alphamultiply") end
   },
   {
     name = 'Subtract PreM',
-    blend = function() G.setBlendMode('subtract', "premultiplied") end
+    blend = function() gfx.setBlendMode('subtract', "premultiplied") end
   },
   -- replace
   {
     name = 'Replace AlphaM',
-    blend = function() G.setBlendMode('replace', "alphamultiply") end
+    blend = function() gfx.setBlendMode('replace', "alphamultiply") end
   },
   {
     name = 'Replace PreM',
-    blend = function() G.setBlendMode('replace', "premultiplied") end
+    blend = function() gfx.setBlendMode('replace', "premultiplied") end
   },
 
   -- pre only
   {
     name = 'Multiply PreM',
-    blend = function() G.setBlendMode('multiply', "premultiplied") end
+    blend = function() gfx.setBlendMode('multiply', "premultiplied") end
   },
   {
     name = 'Darken PreM',
-    blend = function() G.setBlendMode('darken', "premultiplied") end
+    blend = function() gfx.setBlendMode('darken', "premultiplied") end
   },
   {
     name = 'Lighten PreM',
-    blend = function() G.setBlendMode('lighten', "premultiplied") end
+    blend = function() gfx.setBlendMode('lighten', "premultiplied") end
   },
   -- screen
   {
     name = 'Screen AlphaM',
-    blend = function() G.setBlendMode('screen', "alphamultiply") end
+    blend = function() gfx.setBlendMode('screen', "alphamultiply") end
   },
   {
     name = 'Screen PreM',
-    blend = function() G.setBlendMode('screen', "premultiplied") end
+    blend = function() gfx.setBlendMode('screen', "premultiplied") end
   },
 }
 
@@ -188,7 +188,7 @@ local function draw_hl_text(text, highlight, cfg, options)
           end
         end
       end
-      G.setColor(color)
+      gfx.setColor(color)
       local dy = (t_l - 1) * fh
       local dx = (c - 1) * fw
       write_token(dy, dx, char, color, bg, false)

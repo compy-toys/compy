@@ -255,7 +255,7 @@ end
 
 --- @param special boolean
 function BufferView:draw(special)
-  local G = love.graphics
+  local gfx = love.graphics
   local cf_colors = self.cfg.colors
   local colors = cf_colors.editor
   local font = self.cfg.font
@@ -265,17 +265,17 @@ function BufferView:draw(special)
   --- @type VisibleContent|VisibleStructuredContent
   local content_text = vc:get_visible()
   local last_line_n = #content_text
-  local width, height = G.getDimensions()
+  local width, height = gfx.getDimensions()
 
 
   local draw_background = function()
-    G.push('all')
-    G.setColor(colors.bg)
-    G.rectangle("fill", 0, 0, width, height)
-    G.setColor(Color.with_alpha(colors.fg, .0625))
+    gfx.push('all')
+    gfx.setColor(colors.bg)
+    gfx.rectangle("fill", 0, 0, width, height)
+    gfx.setColor(Color.with_alpha(colors.fg, .0625))
     local bh = math.min(last_line_n, self.cfg.lines) * fh
-    G.rectangle("fill", 0, 0, width, bh)
-    G.pop()
+    gfx.rectangle("fill", 0, 0, width, bh)
+    gfx.pop()
   end
 
   local draw_highlight = function()
@@ -284,16 +284,16 @@ function BufferView:draw(special)
     local highlight_line = function(ln)
       if not ln then return end
       if special then
-        G.setColor(colors.highlight_special)
+        gfx.setColor(colors.highlight_special)
       else
         if ls then
-          G.setColor(colors.highlight_loaded)
+          gfx.setColor(colors.highlight_loaded)
         else
-          G.setColor(colors.highlight)
+          gfx.setColor(colors.highlight)
         end
       end
       local l_y = (ln - 1) * fh
-      G.rectangle('fill', 0, l_y, width, fh)
+      gfx.rectangle('fill', 0, l_y, width, fh)
     end
 
     local off = self.offset
@@ -313,7 +313,7 @@ function BufferView:draw(special)
   end
 
   local draw_text = function()
-    G.setFont(font)
+    gfx.setFont(font)
     if self.content_type == 'lua' then
       local vbl = vc:get_visible_blocks()
       for _, block in ipairs(vbl) do
@@ -337,9 +337,9 @@ function BufferView:draw(special)
 
       if love.DEBUG then
         --- phantom text
-        G.setColor(Color.with_alpha(colors.fg, 0.3))
+        gfx.setColor(Color.with_alpha(colors.fg, 0.3))
         local text = string.unlines(content_text)
-        G.print(text)
+        gfx.print(text)
       end
     elseif self.content_type == 'md' then
       local text      = vc:get_visible()
@@ -357,10 +357,10 @@ function BufferView:draw(special)
         ltf = ltf, ctf = ctf, limit = limit,
       })
     elseif self.content_type == 'plain' then
-      G.setColor(colors.fg)
+      gfx.setColor(colors.fg)
       local text = string.unlines(content_text)
 
-      G.print(text)
+      gfx.print(text)
     end
   end
 
@@ -370,8 +370,8 @@ function BufferView:draw(special)
     local lnc = colors.fg
     local x = self.cfg.w - font:getWidth('   ') - 3
     local lnvc = Color.with_alpha(lnc, 0.2)
-    G.setColor(lnvc)
-    G.rectangle("fill", x, 0, 2, self.cfg.h)
+    gfx.setColor(lnvc)
+    gfx.rectangle("fill", x, 0, 2, self.cfg.h)
     local seen = {}
     for ln = 1, self.LINES do
       local l_y = (ln - 1) * fh
@@ -382,12 +382,12 @@ function BufferView:draw(special)
         local l_x = self.cfg.w - font:getWidth(l)
         local l_xv = l_x - font:getWidth(l) - 3.5
         if showap then
-          G.setColor(lnvc)
-          G.print(string.format('%3d', vln), l_xv, l_y)
+          gfx.setColor(lnvc)
+          gfx.print(string.format('%3d', vln), l_xv, l_y)
         end
         if not seen[ln_w] then
-          G.setColor(lnc)
-          G.print(l, l_x, l_y)
+          gfx.setColor(lnc)
+          gfx.print(l, l_x, l_y)
           seen[ln_w] = true
         end
       end

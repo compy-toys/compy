@@ -10,14 +10,14 @@ function BGView:draw(drawable_height)
   local w = cfg.w
   local fh = cfg.fh
 
-  G.push('all')
+  gfx.push('all')
 
   -- background in case input is not visible
-  G.rectangle("fill",
+  gfx.rectangle("fill",
     0,
     drawable_height - 2,
     w,
     fh * 2 + 2
   )
-  G.pop()
+  gfx.pop()
 end
