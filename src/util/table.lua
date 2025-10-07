@@ -281,6 +281,17 @@ function table.find_by(self, pred)
   end
 end
 
+--- Find first element that the predicate holds for
+--- @param self table[]
+--- @param pred function
+--- @return any?
+function table.find_by_v(self, pred)
+  if not self or not pred then return end
+  for _, v in pairs(self) do
+    if pred(v) then return v end
+  end
+end
+
 --- Filter elements that satisfy the predicate
 --- enumerates sequentially
 --- @param self table[]
