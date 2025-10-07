@@ -91,6 +91,20 @@ function EditorController:open(name, content, save)
   self:set_state()
 end
 
+function EditorController:follow_require()
+  local buf = self:get_active_buffer()
+  if not buf.semantic then return end
+  local bn = buf:get_selection()
+  local reqs = buf.semantic.requires
+  local reqsel = table.find_by_v(reqs, function(r)
+    return r.block == bn
+  end)
+  if reqsel then
+    local name = reqsel.name
+    self.console:edit(name .. '.lua')
+  end
+end
+
 --- @param m EditorMode
 --- @return boolean
 local function is_normal(m)
@@ -611,6 +625,11 @@ function EditorController:_normal_mode_keys(k)
     if Key.shift()
         and k == "pagedown" then
       self:_scroll('down', false, 1)
+    end
+
+    -- step into
+    if k == "f4" then
+      self:follow_require()
     end
   end
   local function clear()

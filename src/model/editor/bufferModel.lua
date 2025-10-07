@@ -215,7 +215,7 @@ function BufferModel:set_selection(sel)
 end
 
 --- Get index of selected line/block
---- @return integer
+--- @return integer blocknum
 function BufferModel:get_selection()
   return self.selection
 end

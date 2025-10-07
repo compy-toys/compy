@@ -5,6 +5,9 @@ require('util.table')
 --- @class Definition: Assignment
 --- @field block blocknum
 
+--- @class RequireCall: Require
+--- @field block blocknum
+
 --- @class BufferSemanticInfo
 --- @field definitions Definition[]
 
@@ -12,14 +15,19 @@ require('util.table')
 --- @param rev table
 --- @return BufferSemanticInfo
 local function convert(si, rev)
-  local as = si.assignments
-  local defs = table.map(as, function(a)
+  local blockmap = function(a)
     local r = table.clone(a)
     r.block = rev[a.line]
     return r
-  end)
+  end
+  local as = si.assignments
+  local defs = table.map(as, blockmap)
+  local rs = si.requires
+  local reqs = table.map(rs, blockmap)
+
   return {
     definitions = defs,
+    requires = reqs,
   }
 end
 
