@@ -8,6 +8,9 @@ local messages = {
   user_break = "BREAK into program",
   exit_anykey = "Press any key to exit.",
   exec_error = function(err)
+    Log.error((debug.traceback(
+      "Error: " .. tostring(err), 1):gsub("\n[^\n]+$", "")
+    ))
     return 'Execution error at ' .. err
   end
 }
