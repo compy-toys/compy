@@ -198,6 +198,7 @@ local function project_require(cc, name)
     else
       --- hack around love.js not having the bit lib
       if name == 'bit' and _G.web then
+        ---@diagnostic disable-next-line: inject-field
         pr_env.bit = o_require('util.luabit')
       end
     end

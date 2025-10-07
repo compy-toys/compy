@@ -83,7 +83,7 @@ function getTimestamp()
   return string.format("%s:%s:%s", hours, minutes, seconds)
 end
 ```
-Quick aside on format strings: for a digital clock, we usually want to always have the numbers displayed as two digits, with colons in between them. To achieve this, we `pad` all our results, then stitch them together with `string.format()`.
+Quick aside on format strings: for a digital clock, we usually want to have the numbers displayed as two digits, with colons in between them. To achieve this, we `pad` all our results, then stitch them together with `string.format()`.
 In the above code, we are doing two different kinds of division.First, an integer division (`/`), going from seconds to minutes and hours, in this case we are only interested in the whole numbers, for example: 143 seconds is two full minutes and then some, but what the clock will be displaying is '02', so the remaining 23 seconds is not interesing for the minutes part.
 However, for 143 minutes, the display _should_ say 23, disregarding the two full hours, we are only interested in the remainder part. We can get this value by using `math.fmod()`, in this example, `math.fmod(143, 60)`.
 
