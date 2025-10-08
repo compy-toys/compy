@@ -14,7 +14,7 @@ function moveRight(d)
   tx = tx + (d or (2 * incr))
 end
 
-function pause(msg)
+function pause_game(msg)
   pause(msg or "user paused the game")
 end
 
@@ -27,7 +27,7 @@ local actions = {
   l = moveLeft,
   right = moveRight,
   r = moveRight,
-  pause = pause
+  pause = pause_game
 }
 
 return actions
