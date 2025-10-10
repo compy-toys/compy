@@ -85,6 +85,11 @@ local function new(name, content, save,
   }
 end
 
+--- @param self BufferModel
+local function lateinit(self)
+  self:analyze()
+end
+
 --- @class BufferModel
 --- @field name string
 --- @field content Dequeue -- Content
@@ -105,7 +110,7 @@ end
 --- @field delete_selected_text function
 --- @field replace_selected_text function
 --- @field get_text_content function
-BufferModel = class.create(new)
+BufferModel = class.create(new, lateinit)
 
 function BufferModel:analyze()
   if self.content_type ~= 'lua' then return end
