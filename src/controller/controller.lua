@@ -528,7 +528,7 @@ Controller = {
 
     handlers.keypressed = function(k)
       local function quickswitch()
-        if k == 'f8' then
+        if Key.ctrl() and k == 't' then
           if love.state.app_state == 'running'
               or love.state.app_state == 'inspect'
               or love.state.app_state == 'project_open'
