@@ -85,6 +85,7 @@ function EditorController:open(name, content, save)
   end
 
   local b = BufferModel(name, content, save, ch, hl, pp)
+  b:analyze() --- TODO come up with a nicer lateinit
   self.model.buffers:push_front(b)
   self.view.buffer:open(b)
   self:update_status()

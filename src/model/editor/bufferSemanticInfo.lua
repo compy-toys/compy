@@ -10,6 +10,7 @@ require('util.table')
 
 --- @class BufferSemanticInfo
 --- @field definitions Definition[]
+--- @field requires RequireCall[]
 
 --- @param si SemanticInfo
 --- @param rev table

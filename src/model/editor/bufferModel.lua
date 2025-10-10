@@ -37,7 +37,6 @@ end
 local function new(name, content, save,
                    chunker, highlighter, printer)
   local _content, sel, ct, semantic
-  local revmap = {}
   local readonly = false
 
   local lines = string.lines(content or '')
@@ -51,21 +50,10 @@ local function new(name, content, save,
   --- @param chk function
   local function luacontent(chk)
     ct = 'lua'
-    local ok, blocks, ast = chk(lines)
+    local ok, blocks = chk(lines)
     if ok then
       local len = #blocks
       sel = len + 1
-      local anaok, ana = pcall(analyzer.analyze, ast)
-      if anaok then
-        for bi, v in ipairs(blocks) do
-          if (v.pos) then
-            for _, l in ipairs(v.pos:enumerate()) do
-              revmap[l] = bi
-            end
-          end
-        end
-        semantic = bsi.convert(ana, revmap)
-      end
     else
       readonly = true
       sel = 1
@@ -90,6 +78,7 @@ local function new(name, content, save,
     chunker = chunker,
     highlighter = highlighter,
     printer = printer,
+    revmap = {},
     semantic = semantic,
     selection = sel,
     readonly = readonly
@@ -105,6 +94,7 @@ end
 --- @field loaded integer?
 --- @field readonly boolean
 --- @field semantic BufferSemanticInfo?
+--- @field revmap table?
 ---
 --- @field chunker Chunker
 --- @field highlighter Highlighter
@@ -117,6 +107,23 @@ end
 --- @field get_text_content function
 BufferModel = class.create(new)
 
+function BufferModel:analyze()
+  if self.content_type ~= 'lua' then return end
+  local lines = string.lines(self:get_text_content())
+  local ok, blocks, ast = self.chunker(lines)
+  if not ok then return end
+  local anaok, ana = pcall(analyzer.analyze, ast)
+  if not anaok then return end
+  for bi, v in ipairs(blocks) do
+    if (v.pos) then
+      for _, l in ipairs(v.pos:enumerate()) do
+        self.revmap[l] = bi
+      end
+    end
+  end
+  self.semantic = bsi.convert(ana, self.revmap)
+end
+
 function BufferModel:rechunk()
   if self.content_type ~= 'lua' then return end
   local content = self:get_text_content()
@@ -127,6 +134,7 @@ end
 function BufferModel:save()
   self:highlight()
   local text = self:get_text_content()
+  self:analyze()
   return self.save_file(text)
 end
 
