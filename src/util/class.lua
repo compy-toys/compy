@@ -1,7 +1,8 @@
 return {
   --- Simple factory, to spare boilerplate
   --- @param constructor function?
-  create = function(constructor)
+  --- @param lateinit function?
+  create = function(constructor, lateinit)
     local ret = {}
     ret.__index = ret
     local function new(...)
@@ -16,8 +17,10 @@ return {
         if type(cls.new) == "function" then
           return cls.new(...)
         else
-          local instance = new(...)
-          setmetatable(instance, cls)
+          local instance = setmetatable(new(...), cls)
+          if type(lateinit) == "function" then
+            lateinit(instance)
+          end
           return instance
         end
       end,
