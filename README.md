@@ -82,6 +82,7 @@ a project must be selected first.
 | Search definitions                                                | <kbd>Ctrl</kbd>+<kbd>F</kbd>                  |
 | Exit search                                                       | <kbd>Esc</kbd>                                |
 | Jump to selected definition                                       | <kbd>Enter ⏎</kbd>                            |
+| Edit required file / return to previous                           | <kbd>Ctrl</kbd>+<kbd>O</kbd>                  |
 
 ## Projects
 
