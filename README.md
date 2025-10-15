@@ -161,7 +161,7 @@ To modify an existing line, navigate there with
 ![capitalized](./doc/interface/hello_cap.apng)
 
 Happy with the modifications now, we can quit by pressing
-<kbd>Ctrl-Shift-Q</kbd>
+<kbd>Ctrl-Shift-S</kbd>
 
 ![quit](./doc/interface/quit_editor.apng)
 

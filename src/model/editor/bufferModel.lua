@@ -28,14 +28,19 @@ end
 --- @alias Content Dequeue<string>|Dequeue<Block>
 
 --- @param name string
---- @param content string
+--- @param content str
 --- @param save function
 --- @param chunker Chunker?
 --- @param highlighter Highlighter?
 --- @param printer function?
 --- @return BufferModel?
-local function new(name, content, save,
-                   chunker, highlighter, printer)
+local function new(
+    name,
+    content,
+    save,
+    chunker,
+    highlighter,
+    printer)
   local _content, sel, ct, semantic
   local readonly = false
 

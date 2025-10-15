@@ -45,6 +45,9 @@ loin█ bresaola veni | 5
 son.                |
 ```
 We arrive at 'visible coords'.
+
+#### convert
+
 What is `visible(3, 3)` in the others?
 * `wrapped(11, 3)`
 * `normal(4, 41)`
