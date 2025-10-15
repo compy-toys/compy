@@ -1,3 +1,7 @@
+--- @alias Id string
+--- @class Object
+--- @field id Id
+
 return {
   --- Simple factory, to spare boilerplate
   --- @param constructor function?
