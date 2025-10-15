@@ -182,6 +182,9 @@ local function utils()
     lgui   = false,
     rgui   = false,
   }
+  local shortcuts = {
+    toggle = 'C-t'
+  }
 
 
   --- @param tag string
@@ -234,6 +237,7 @@ local function utils()
   --- @field love_text function
   --- @field screenshot function
   --- @field release_keys function
+  --- @field shortcuts table
   return {
     patch_isDown = function()
       local down = love.keyboard.isDown
@@ -290,6 +294,8 @@ local function utils()
     end,
 
     release_keys = release_keys,
+
+    shortcuts = shortcuts,
 
     screenshot = function(tag)
       timer:script(function(wait)
@@ -362,6 +368,7 @@ local function runner()
       end)
 
       scrun = coroutine.create(function()
+        -- timer = Timer.new()
         for _, v in ipairs(scenarios) do
           local tag = v.id
           local sc = v.sc
