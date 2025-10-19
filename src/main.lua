@@ -1,5 +1,6 @@
 local redirect_to = require("model.io.redirect")
 local OS = require("util.os")
+
 require("model.consoleModel")
 require("controller.controller")
 require("controller.consoleController")
@@ -104,6 +105,7 @@ local config_view = function(flags)
     drawableWidth = drawableWidth,
     drawableChars = drawableChars,
 
+    fold_lines = 1,
     drawtest = tf.draw,
     sizedebug = tf.size,
   }

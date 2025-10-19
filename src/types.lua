@@ -57,6 +57,7 @@
 --- @field debugwidth integer
 --- @field drawableWidth number
 --- @field drawableChars integer
+--- @field fold_lines integer
 --- @field drawtest boolean
 --- @field sizedebug boolean
 
