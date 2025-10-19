@@ -4,6 +4,11 @@ require("util.wrapped_text")
 require("util.scrollable")
 require("util.range")
 
+--- @class VSCOpts
+--- @field w integer
+--- @field size_max integer
+--- @field overscroll integer
+--- @field view_config ViewConfig
 --- @alias ReverseMap Dequeue<integer>
 --- Inverse mapping from line number to block index
 
@@ -38,18 +43,20 @@ setmetatable(VisibleStructuredContent, {
 })
 
 --- @param w integer
+--- @param opts VSCOpts
 --- @param blocks Block[]
 --- @param highlighter fun(c: string[]): SyntaxColoring
---- @param overscroll integer
---- @param size_max integer
 --- @return VisibleStructuredContent
-function VisibleStructuredContent.new(w, blocks, highlighter,
-                                      overscroll, size_max)
+function VisibleStructuredContent.new(
+    opts,
+    blocks,
+    highlighter)
   local self = setmetatable({
+    size_max = opts.size_max,
+    overscroll_max = opts.overscroll,
+    w = opts.w,
+    cfg = opts.view_config,
     highlighter = highlighter,
-    size_max = size_max,
-    overscroll_max = overscroll,
-    w = w,
   }, VisibleStructuredContent)
   self:load_blocks(blocks)
   self:to_end()

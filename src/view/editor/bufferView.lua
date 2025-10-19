@@ -65,12 +65,14 @@ function BufferView:open(buffer)
   elseif ct == 'lua' then
     local bufcon = buffer:get_content()
     self.content =
-        VisibleStructuredContent(
-          self.w,
+        VisibleStructuredContent({
+            w = self.w,
+            overscroll = self.SCROLL_BY,
+            size_max = L,
+            view_config = self.cfg,
+          },
           bufcon,
-          buffer.highlighter,
-          self.SCROLL_BY,
-          L)
+          buffer.highlighter)
   else
     error 'unknown filetype'
   end

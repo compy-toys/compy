@@ -109,8 +109,6 @@ function EditorController:pop_buffer()
   self.view:get_current_buffer():open(b)
 end
 
-end
-
 --- @param m EditorMode
 --- @return boolean
 local function is_normal(m)
