@@ -1,6 +1,7 @@
 require("view.editor.visibleBlock")
 
 require("util.wrapped_text")
+require("util.scrollable")
 require("util.range")
 
 --- @alias ReverseMap Dequeue<integer>
