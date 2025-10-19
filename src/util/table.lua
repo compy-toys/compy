@@ -363,3 +363,27 @@ function table.map(self, f)
   end
   return ret
 end
+
+--- Tabulate array values with index (returns new table)
+--- @param self table
+--- @param f function
+--- @return table
+function table.imap(self, f)
+  local ret = {}
+  for i, v in ipairs(self) do
+    ret[i] = f(v, i)
+  end
+  return ret
+end
+
+--- Create a table of `n` elements by running `f`
+--- @param n integer
+--- @param f function
+--- @return table
+function table.fill(n, f)
+  local ret = {}
+  for i = 1, n do
+    ret[i] = f()
+  end
+  return ret
+end
