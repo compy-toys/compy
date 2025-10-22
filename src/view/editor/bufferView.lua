@@ -15,7 +15,7 @@ local function new(cfg)
     cfg = cfg,
     LINES = l,
     SCROLL_BY = math.floor(l / 2),
-    w = cfg.drawableChars,
+    wrap_w = cfg.drawableChars,
 
     content = nil,
     content_type = nil,
@@ -33,8 +33,8 @@ end
 --- @field cfg ViewConfig
 --- @field LINES integer
 --- @field SCROLL_BY integer
---- @field w integer
 --- @field offset integer
+--- @field wrap_w integer
 --- @field more More
 ---
 --- @field open function
@@ -61,14 +61,14 @@ function BufferView:open(buffer)
     local bufcon = buffer:get_text_content()
     self.buffer:highlight()
     self.content = VisibleContent(
-      self.w, bufcon, self.SCROLL_BY, L)
+      self.wrap_w, bufcon, self.SCROLL_BY, L)
     self.hl = self.buffer:get_highlight()
   elseif ct == 'lua' then
     local bufcon = buffer:get_content()
     self.content =
         VisibleStructuredContent({
-            w = self.w,
-            overscroll = self.SCROLL_BY,
+            wrap_w = self.wrap_w,
+            overscroll_max = self.SCROLL_BY,
             size_max = L,
             cfg = self.cfg,
           },
