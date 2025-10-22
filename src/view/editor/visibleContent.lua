@@ -134,6 +134,7 @@ function VisibleContent:move_range(by)
     if r then
       local nr, n = r:translate_limit(by, 1, upper)
       self:set_range(nr)
+      self.offset = nr.start - 1
       return n
     end
   end

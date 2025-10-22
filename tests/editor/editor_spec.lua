@@ -202,7 +202,7 @@ describe('Editor #editor', function()
       it('loads', function()
         --- inital scroll is at EOF, meaning last l lines are visible
         --- plus the phantom line
-        assert.same(off, bv.offset)
+        assert.same(off, bv:get_offset())
         assert.same(start_range, visible.range)
       end)
       local base = Range(1, l)
@@ -261,7 +261,7 @@ describe('Editor #editor', function()
       it('loads', function()
         --- inital scroll is at EOF, meaning last l lines are visible
         --- plus the phantom line
-        assert.same(off, bv.offset)
+        assert.same(off, bv:get_offset())
         assert.same(start_range, visible.range)
       end)
       local base = Range(1, l)

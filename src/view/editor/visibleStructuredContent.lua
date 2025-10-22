@@ -56,6 +56,7 @@ function VisibleStructuredContent.new(
     overscroll = opts.overscroll_max,
     opts = opts,
     highlighter = highlighter,
+    offset = 0,
   }, VisibleStructuredContent)
   self:load_blocks(blocks)
   self:to_end()
@@ -162,6 +163,7 @@ function VisibleStructuredContent:move_range(by)
     local upper = self:get_text_length() + self.overscroll
     local nr, n = r:translate_limit(by, 1, upper)
     self:set_range(nr)
+    self.offset = nr.start - 1
     return n
   end
   return 0

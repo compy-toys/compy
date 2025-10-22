@@ -20,7 +20,7 @@ local function new(cfg)
     content = nil,
     content_type = nil,
     more = { up = false, down = false },
-    offset = 0,
+
     buffer = nil
   }
 end
@@ -33,7 +33,6 @@ end
 --- @field cfg ViewConfig
 --- @field LINES integer
 --- @field SCROLL_BY integer
---- @field offset integer
 --- @field wrap_w integer
 --- @field more More
 ---
@@ -78,10 +77,7 @@ function BufferView:open(buffer)
     error 'unknown filetype'
   end
 
-  -- TODO clean this up
-  local clen = self.content:get_text_length()
-  self.offset = math.max(clen - L, 0)
-  local off = self.offset
+  local off = self.content.offset
   if off > 0 then
     self.more.up = true
   end
@@ -121,7 +117,7 @@ function BufferView:get_state()
   return {
     filename = buf.name,
     selection = buf.selection,
-    offset = self.offset,
+    offset = self.content.offset,
   }
 end
 
@@ -153,7 +149,7 @@ function BufferView:refresh(moved)
   end
 
   local clen = self.content:get_content_length()
-  local off = self.offset
+  local off = self.content.offset
   local si = 1 + off
   local ei = math.min(self.LINES, clen + 1) + off
   self:_update_visible(Range(si, ei))
@@ -162,6 +158,11 @@ end
 -------------------
 ---  scrolling  ---
 -------------------
+
+--- @return integer
+function BufferView:get_offset()
+  return self.content.offset
+end
 
 --- @private
 --- @return Range
@@ -193,8 +194,7 @@ function BufferView:scroll(dir, by, warp)
       end
     end
   end)()
-  local o = self.content:move_range(n)
-  self.offset = self.offset + o
+  self.content:move_range(n)
 end
 
 --- @param off integer
@@ -303,7 +303,7 @@ function BufferView:draw(special)
       gfx.rectangle('fill', 0, l_y, width, fh)
     end
 
-    local off = self.offset
+    local off = self.content.offset
     for _, w in ipairs(ws) do
       for _, v in ipairs(w) do
         if self.content.range:inc(v) then
@@ -330,7 +330,7 @@ function BufferView:draw(special)
         local text = wt:get_text()
         local highlight = { hl = block.highlight }
         local ltf = function(l)
-          return l + rs - 1 - self.offset
+          return l + rs - 1 - self.content.offset
         end
         local ctf = function(a) return a end
         local limit = self.cfg.lines
@@ -382,7 +382,7 @@ function BufferView:draw(special)
     local seen = {}
     for ln = 1, self.LINES do
       local l_y = (ln - 1) * fh
-      local vln = ln + self.offset
+      local vln = ln + self.content.offset
       local ln_w = self.content.wrap_reverse[vln]
       if ln_w then
         local l = string.format('%3d', ln_w)
