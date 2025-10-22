@@ -3,15 +3,11 @@ require("model.input.userInputModel")
 require("controller.userInputController")
 require("view.input.userInputView")
 
+TU = require('tests.testutil')
+
 describe("input view spec #input", function()
-  local w        = 24
-  local mockConf = {
-    view = {
-      drawableChars = w,
-      lines = 16,
-      input_max = 14
-    },
-  }
+  local w        = 8
+  local mockConf = TU.mock_view_cfg(w)
 
   mock           = require("tests.mock")
   local love     = {
