@@ -70,7 +70,7 @@ function BufferView:open(buffer)
             w = self.w,
             overscroll = self.SCROLL_BY,
             size_max = L,
-            view_config = self.cfg,
+            cfg = self.cfg,
           },
           bufcon,
           buffer.highlighter)
