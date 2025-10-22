@@ -166,3 +166,15 @@
 ---
 --- @field tokenize fun(str): table
 --- @field syntax_hl fun(table): SyntaxColoring
+
+---@alias FPSC
+---| 'off'
+---| 'T_L"
+---| 'T_R"
+
+--- @class Profile
+--- @field report table
+--- @field frame integer
+--- @field n_frames integer
+--- @field n_rows integer
+--- @field fpsc FPSC

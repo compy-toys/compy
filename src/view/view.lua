@@ -1,5 +1,9 @@
+local gfx = love.graphics
+
 --- @type love.Image?
 local canvas_snapshot = nil
+
+local FPSfont = gfx.newFont("assets/fonts/fraps.otf", 24)
 
 View = {
   prev_draw = nil,
@@ -30,6 +34,26 @@ View = {
   clear_snapshot = function()
     canvas_snapshot = nil
   end,
+
+  drawFPS = function()
+    local pr = love.PROFILE
+    if type(pr) ~= 'table' then return end
+    if love.PROFILE.fpsc == 'off' then return end
+
+    local fps = tostring(love.timer.getFPS())
+    local w = FPSfont:getWidth(fps)
+    local x
+    if love.PROFILE.fpsc == 'T_L' then
+      x = 10
+    elseif love.PROFILE.fpsc == 'T_R' then
+      x = gfx.getWidth() - 10 - w
+    end
+    gfx.push('all')
+    gfx.setColor(Color[Color.yellow])
+    gfx.setFont(FPSfont)
+    gfx.print(fps, x, 10)
+    gfx.pop()
+  end
 }
 
 --- @class ViewBase

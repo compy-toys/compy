@@ -100,6 +100,10 @@ local function run_user_code(f, cc, project_path)
   end
   ok, call_err = pcall(f)
   if project_path and ok then -- user project exec
+    if love.PROFILE then
+      love.PROFILE.frame = 0
+      love.PROFILE.report = {}
+    end
     cc.main_ctrl.set_user_handlers(env['love'])
   end
   output:restore_main()
@@ -629,6 +633,7 @@ function ConsoleController:stop_project_run()
   View.clear_snapshot()
   self.main_ctrl.set_love_draw(self, self.view)
   self.main_ctrl.clear_user_handlers()
+  self.main_ctrl.report()
   love.state.app_state = 'project_open'
 end
 

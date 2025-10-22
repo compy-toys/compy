@@ -1,3 +1,4 @@
+Prof = require("controller.profiler")
 require("view.view")
 
 require("util.string.string")
@@ -42,7 +43,7 @@ local _supported = {
   'touchreleased',
 }
 
-local _C
+local _C, _mode
 
 --- @param msg string
 local function user_error_handler(msg)
@@ -106,8 +107,12 @@ local set_handlers = function(userlove)
 
   -- drawing - separate table
   local draw = userlove.draw
+
   if draw and draw ~= View.main_draw then
-    love.draw = draw
+    love.draw = function()
+      draw()
+      View.drawFPS()
+    end
     user_draw = true
   end
 end
@@ -342,6 +347,9 @@ Controller = {
   --- @param C ConsoleController
   set_love_update = function(C)
     local function update(dt)
+      if love.PROFILE then
+        Prof.update()
+      end
       if click_timer > 0 then
         click_timer = click_timer - dt
       end
@@ -396,7 +404,9 @@ Controller = {
       then
         wrap(uup, dt)
       end
-      Controller.snapshot()
+      if _mode ~= 'play' then
+        Controller.snapshot()
+      end
       if love.harmony then
         love.harmony.timer_update(dt)
       end
@@ -417,6 +427,7 @@ Controller = {
   set_love_draw = function(C, CV)
     local function draw()
       View.draw(C, CV)
+      View.drawFPS()
     end
     love.draw = draw
 
@@ -470,8 +481,9 @@ Controller = {
   ---  public  ---
   ----------------
   --- @param C ConsoleController
-  init = function(C)
+  init = function(C, mode)
     _C = C
+    _mode = mode
   end,
   --- @param C ConsoleController
   --- @param CV ConsoleView
@@ -527,6 +539,7 @@ Controller = {
     local handlers = love.handlers
 
     handlers.keypressed = function(k)
+      --- Power shortcuts
       local function quickswitch()
         if Key.ctrl() and k == 't' then
           if love.state.app_state == 'running'
@@ -577,15 +590,40 @@ Controller = {
           C:restart()
         end
       end
+      local function profile()
+        if Key.ctrl() and Key.alt() and k == "p" then
+          if Key.shift() then
+            Prof.stop_profiler()
+          else
+            -- Prof.start_profiler()
+            Prof.start_oneshot()
+          end
+        end
+        if k == "f10" then
+          if love.PROFILE.fpsc == 'off' then
+            love.PROFILE.fpsc = 'T_L'
+          elseif love.PROFILE.fpsc == 'T_L' then
+            love.PROFILE.fpsc = 'T_R'
+          elseif love.PROFILE.fpsc == 'T_R' then
+            love.PROFILE.fpsc = 'off'
+          end
+        end
+      end
 
       if playback then
         if love.state.app_state == 'shutdown' then
           love.event.quit()
         end
         restart()
+        if love.PROFILE then
+          profile()
+        end
       else
         restart()
         quickswitch()
+        if love.PROFILE then
+          profile()
+        end
         project_state_change()
       end
 
@@ -767,5 +805,16 @@ Controller = {
   clear_user_handlers = function()
     Controller._userhandlers = {}
     View.clear_snapshot()
+  end,
+
+  oneshot = function()
+    if not love.PROFILE then return end
+    Prof.start_oneshot()
+  end,
+
+  report = function()
+    if not love.PROFILE then return end
+    local report = Prof.report()
+    Log.debug(report)
   end,
 }

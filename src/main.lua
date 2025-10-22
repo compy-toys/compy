@@ -264,6 +264,9 @@ function love.load()
   local autotest =
       mode == 'test' and startup.testflags.auto or false
   local playback = mode == 'play'
+  if love.PROFILE then
+    love.profiler = require('lib.profile')
+  end
 
   if playback and not string.is_non_empty_string(startup.path) then
     exit(messages.play_no_project)
@@ -340,7 +343,7 @@ function love.load()
   local CV = ConsoleView(baseconf, CC)
   CC:set_view(CV)
 
-  ctrl.init(CC)
+  ctrl.init(CC, mode)
   ctrl.setup_callback_handlers(CC)
   ctrl.set_default_handlers(CC, CV)
 
