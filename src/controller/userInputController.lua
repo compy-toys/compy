@@ -407,6 +407,7 @@ end
 --   mouse   --
 ---------------
 
+--- @private
 --- @param x integer
 --- @param y integer
 --- @return integer c
@@ -423,6 +424,7 @@ function UserInputController:_translate_to_input_grid(x, y)
   return char, line
 end
 
+--- @private
 --- @param x integer
 --- @param y integer
 --- @param btn integer
