@@ -122,7 +122,7 @@ function UserInputView:draw_input(input, time)
   local visible = vc:get_visible()
   gfx.setFont(self.cfg.font)
   drawBackground()
-  self.statusline:draw(status, apparentLines, time)
+  self.statusline:draw(status, apparentLines)
 
   if highlight then
     local hl = highlight.hl

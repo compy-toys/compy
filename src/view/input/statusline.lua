@@ -8,8 +8,7 @@ end)
 
 --- @param status Status
 --- @param nLines integer
---- @param time number?
-function Statusline:draw(status, nLines, time)
+function Statusline:draw(status, nLines)
   local gfx = love.graphics
   local cf = self.cfg
   local colors = (function()
@@ -75,9 +74,6 @@ function Statusline:draw(status, nLines, time)
       end
       gfx.print((love.state.app_state or '???'),
         midX - (13 * cf.fw), start_text.y)
-      if time then
-        gfx.print(tostring(time), midX, start_text.y)
-      end
       gfx.setColor(colors.fg)
     end
 
