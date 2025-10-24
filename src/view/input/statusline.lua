@@ -8,7 +8,8 @@ end)
 
 --- @param status Status
 --- @param nLines integer
-function Statusline:draw(status, nLines)
+--- @param start_y integer?
+function Statusline:draw(status, nLines, start_y)
   local gfx = love.graphics
   local cf = self.cfg
   local colors = (function()
@@ -22,7 +23,8 @@ function Statusline:draw(status, nLines)
       return cf.colors.statusline.console
     end
   end)()
-  local h = cf.h
+
+  local h = start_y or cf.h
   local w = cf.w
   local fh = cf.fh
   local font = cf.font
