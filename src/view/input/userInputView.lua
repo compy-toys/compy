@@ -121,7 +121,8 @@ function UserInputView:draw_input(input)
   local visible = vc:get_visible()
   gfx.setFont(self.cfg.font)
   drawBackground()
-  self.statusline:draw(status, apparentLines)
+  local sl_y = start_y - fh
+  self.statusline:draw(status, sl_y)
 
   if highlight then
     local hl = highlight.hl

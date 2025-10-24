@@ -7,37 +7,37 @@ end)
 
 
 --- @param status Status
---- @param nLines integer
 --- @param start_y integer?
-function Statusline:draw(status, nLines, start_y)
+function Statusline:draw(status, start_y)
   local gfx = love.graphics
   local cf = self.cfg
   local colors = (function()
-    if love.state.app_state == 'inspect' then
+    local state = love.state.app_state
+    if state == 'inspect' then
       return cf.colors.statusline.inspect
-    elseif love.state.app_state == 'running' then
+    elseif state == 'running' then
       return cf.colors.statusline.user
-    elseif love.state.app_state == 'editor' then
+    elseif state == 'editor' then
       return cf.colors.statusline.editor
     else
       return cf.colors.statusline.console
     end
   end)()
 
-  local h = start_y or cf.h
+  local h = start_y or 0
   local w = cf.w
   local fh = cf.fh
   local font = cf.font
 
-  local sy = h - (1 + nLines) * fh
-  local start_box = { x = 0, y = sy }
+  local start_box = { x = 0, y = h }
   local endTextX = start_box.x + w - fh
   local midX = (start_box.x + w) / 2
 
   local function drawBackground()
     gfx.setColor(colors.bg)
     gfx.setFont(font)
-    local corr = 2 -- correct for fractional slit left under the terminal
+    --- correct for fractional slit left under the terminal
+    local corr = 2
     gfx.rectangle("fill", start_box.x, start_box.y - corr, w, fh + corr)
   end
 
@@ -58,6 +58,7 @@ function Statusline:draw(status, nLines, start_y)
   end
 
   local function drawStatus()
+    local state = love.state.app_state
     local custom = status.custom
     local start_text = {
       x = start_box.x + fh,
@@ -74,8 +75,9 @@ function Statusline:draw(status, nLines, start_y)
       if love.state.testing then
         gfx.print('testing', midX - (8 * cf.fw), start_text.y)
       end
-      gfx.print((love.state.app_state or '???'),
-        midX - (13 * cf.fw), start_text.y)
+      local lw = font:getWidth(state) / 2
+      gfx.print((state or '???'),
+        midX - lw, start_text.y)
       gfx.setColor(colors.fg)
     end
 
