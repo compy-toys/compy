@@ -22,6 +22,16 @@ end
 --- @field oneshot boolean
 UserInputView = class.create(new)
 
+local get_colors = function(cf_colors)
+  if love.state.app_state == 'inspect' then
+    return cf_colors.input.inspect
+  elseif love.state.app_state == 'running' then
+    return cf_colors.input.user
+  else
+    return cf_colors.input.console
+  end
+end
+
 --- @param input InputDTO
 function UserInputView:draw_input(input)
   local gfx = love.graphics
@@ -29,15 +39,7 @@ function UserInputView:draw_input(input)
   local cfg = self.cfg
   local status = self.controller:get_status()
   local cf_colors = cfg.colors
-  local colors = (function()
-    if love.state.app_state == 'inspect' then
-      return cf_colors.input.inspect
-    elseif love.state.app_state == 'running' then
-      return cf_colors.input.user
-    else
-      return cf_colors.input.console
-    end
-  end)()
+  local colors = get_colors(cf_colors)
 
   local fh = cfg.fh
   local fw = cfg.fw
