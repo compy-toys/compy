@@ -590,6 +590,7 @@ function ConsoleController:open_project(name, play)
     then
       table.insert(package.loaders, 1, project_loader)
     end
+    love.state.app_state = 'project_open'
   end
   if open then
     print('Project ' .. name .. ' opened')

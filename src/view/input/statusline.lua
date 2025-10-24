@@ -73,7 +73,8 @@ function Statusline:draw(status, nLines, time)
       if love.state.testing then
         gfx.print('testing', midX - (8 * cf.fw), start_text.y)
       end
-      gfx.print(love.state.app_state, midX - (13 * cf.fw), start_text.y)
+      gfx.print((love.state.app_state or '???'),
+        midX - (13 * cf.fw), start_text.y)
       if time then
         gfx.print(tostring(time), midX, start_text.y)
       end
