@@ -109,6 +109,7 @@ local set_handlers = function(userlove)
   local draw = userlove.draw
 
   if draw and draw ~= View.main_draw then
+    --- @diagnostic disable-next-line: duplicate-set-field
     love.draw = function()
       draw()
       View.drawFPS()
@@ -387,11 +388,7 @@ Controller = {
           end
           local user_input = get_user_input()
           if user_input then
-            if love.DEBUG then
-              user_input.V:draw(user_input.C:get_input(), C.time)
-            else
-              user_input.V:draw(user_input.C:get_input())
-            end
+            user_input.V:draw(user_input.C:get_input())
           end
         end
         View.prev_draw = draw

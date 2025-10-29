@@ -50,11 +50,7 @@ function ConsoleView:draw(terminal, canvas, input, snapshot)
       self.drawable_height, snapshot)
 
     if ViewUtils.conditional_draw('show_input') then
-      local time = nil
-      if self.cfg.view.show_debug_timer then
-        time = self.controller:get_timestamp()
-      end
-      self.input:draw(input, time)
+      self.input:draw(input)
     end
   end
 
