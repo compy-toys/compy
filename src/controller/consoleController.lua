@@ -161,13 +161,15 @@ function ConsoleController:run_project(name)
       { "There's already a project running!" })
     return
   end
-  local P = self.model.projects
+  local P   = self.model.projects
+  local cur = P.current
   local ok
-  if P.current then
+  if cur and cur == name then
     ok = true
   else
     ok = self:open_project(name, false)
   end
+
   if ok then
     local runner_env        = self:get_project_env()
     local f, load_err, path = P:run(name, runner_env)
@@ -615,6 +617,11 @@ function ConsoleController:open_project(name, play)
     print('No project name provided!')
     return false
   end
+  local cur = P.current
+  if cur then
+    self:close_project()
+  end
+
   local open, create, err = P:opreate(name, play)
   local ok = open or create
   if ok then
