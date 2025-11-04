@@ -157,8 +157,7 @@ local setup_storage = function(mode)
   else
     if OS.get_name() == 'Android' then
       if mode == 'play' then
-        local savedir = love.filesystem.getSaveDirectory()
-        FS.mkdirp(savedir)
+        --- initializing directory moved to app code
       else
         local ok, sd_path = android_storage_find()
         if not ok then
@@ -189,8 +188,10 @@ local setup_storage = function(mode)
     project_path = project_path,
   }
   for _, d in pairs(paths) do
-    local ok, err = FS.mkdir(d)
-    if not ok then Log(err) end
+    if mode ~= 'play' then
+      local ok, err = FS.mkdirp(d)
+      if not ok then Log(err) end
+    end
   end
   --- this is virtual, we don't want to actually create it
   paths.play_path = '/play'
