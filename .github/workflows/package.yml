@@ -321,6 +321,7 @@ jobs:
           name: ${{ env.IDE_DEBUG_APK_NAME }}
           path: ${{ env.ARTIFACT_FOLDER }}
       - uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: ${{ env.IDE_APK_NAME }}
           path: ${{ env.ARTIFACT_FOLDER }}
@@ -329,6 +330,7 @@ jobs:
           name: ${{ env.PLAYER_DEBUG_APK_NAME }}
           path: ${{ env.ARTIFACT_FOLDER }}
       - uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: ${{ env.PLAYER_APK_NAME }}
           path: ${{ env.ARTIFACT_FOLDER }}
