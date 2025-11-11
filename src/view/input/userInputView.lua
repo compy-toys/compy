@@ -333,6 +333,9 @@ end
 
 --- Draw the pre-rendered canvas to screen
 function UserInputView:draw()
+  if not self.controller:is_oneshot() then
+    self.controller:update_view()
+  end
   local h = self.start_h
   love.graphics.draw(self.canvas, 0, h)
 end
