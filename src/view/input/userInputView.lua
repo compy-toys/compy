@@ -117,12 +117,13 @@ function UserInputView:render_input(input, status)
 
     if vcl < 1 then return end
 
-    local ch = start_y + (vcl - 1) * fh
+    local ch = vcl * fh
     local x_offset = math.fmod(acc, w)
+    local x = (x_offset - .5) * fw
 
     gfx.push('all')
     gfx.setColor(cf_colors.input.cursor)
-    gfx.print('|', (x_offset - .5) * fw, ch)
+    gfx.print('|', x, ch)
     gfx.pop()
   end
 
