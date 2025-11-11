@@ -176,6 +176,7 @@ Controller = {
         if love.DEBUG then
           if k == "1" then
             table.toggle(love.debug, 'show_terminal')
+            table.toggle(love.debug, 'show_buffer')
           end
           if k == "2" then
             table.toggle(love.debug, 'show_snapshot')

@@ -306,8 +306,9 @@ function love.load()
   }
   if love.DEBUG then
     love.debug = {
-      show_snapshot = true,
       show_terminal = true,
+      show_buffer = true,
+      show_snapshot = true,
       show_canvas = true,
       show_input = true,
       once = 0
