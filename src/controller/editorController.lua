@@ -462,6 +462,7 @@ function EditorController:_search_mode_keys(k)
     return
   end
 
+  self.input:update_view()
   local jump = self.search:keypressed(k)
   if jump then
     local buf = self:get_active_buffer()

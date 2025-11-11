@@ -388,6 +388,7 @@ end
 
 --- @param t string
 function UserInputController:textinput(t)
+  self:update_view()
   if self.model:has_error() then
     return
   end
@@ -401,6 +402,7 @@ end
 --- @param k string
 function UserInputController:keyreleased(k)
   local input = self.model
+  self:update_view()
 
   if input:has_error() then
     if k == 'space' then
