@@ -285,18 +285,19 @@ end
 function UserInputView:render_error(err_text)
   local colors = self.cfg.colors
   local fh = self.cfg.fh
-  local h = self.start_h
-  local drawableWidth = self.cfg.drawableWidth
+  local vpH = gfx.getHeight()
+
   local inLines = #err_text
-  local inHeight = inLines * fh
+  self.start_h = vpH - (inLines + 1) * fh
+  local drawableWidth = self.cfg.drawableWidth
   local apparentHeight = #err_text
-  local start_y = h - inHeight
+  local start_y = fh -- statusline
 
   local drawBackground = function()
     gfx.setColor(colors.input.error_bg)
     gfx.rectangle("fill",
       0,
-      start_y,
+      fh,
       drawableWidth,
       apparentHeight * fh)
   end
@@ -323,6 +324,7 @@ function UserInputView:render(input, status)
   local isError = string.is_non_empty_string_array(err_text)
 
   gfx.setCanvas(self.canvas)
+  gfx.clear(0,0,0)
   if isError then
     self:render_error(err_text)
   else
