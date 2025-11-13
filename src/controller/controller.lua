@@ -478,9 +478,9 @@ Controller = {
   ----------------
   ---  public  ---
   ----------------
-  --- @param C ConsoleController
-  init = function(C, mode)
-    _C = C
+  --- @param CC ConsoleController
+  init = function(CC, mode)
+    _C = CC
     _mode = mode
   end,
   --- @param C ConsoleController
