@@ -262,13 +262,13 @@ function UserInputView:render(input, status)
   local err_text = input.wrapped_error or {}
   local isError = string.is_non_empty_string_array(err_text)
 
-  self.canvas:renderTo(function ()
-      gfx.clear(0, 0, 0, 1)
-      if isError then
-        self:render_error(err_text)
-      else
-        self:render_input(input, status)
-      end
+  self.canvas:renderTo(function()
+    gfx.clear(0, 0, 0, 1)
+    if isError then
+      self:render_error(err_text)
+    else
+      self:render_input(input, status)
+    end
   end)
 end
 
