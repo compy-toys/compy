@@ -380,9 +380,11 @@ Controller = {
       local ddr = View.prev_draw
       local ldr = love.draw
       if ldr ~= ddr then
-        local draw =function()
+        local draw = function()
           if ldr then
+            gfx.push('all')
             wrap(ldr)
+            gfx.pop()
           end
           local ui = get_user_input()
           if ui then
