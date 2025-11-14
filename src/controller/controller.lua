@@ -106,14 +106,15 @@ local set_handlers = function(userlove)
   end
 
   -- drawing - separate table
-  local draw = userlove.draw
-
-  if draw and draw ~= View.main_draw then
+  local udr = userlove.draw
+  local mdr = View.main_draw
+  if udr and udr ~= mdr then
     --- @diagnostic disable-next-line: duplicate-set-field
-    love.draw = function()
-      draw()
+    local ndr = function()
+      udr()
       View.drawFPS()
     end
+    love.draw = ndr
     user_draw = true
   end
 end
@@ -379,19 +380,20 @@ Controller = {
         end
         click_count = 0
       end
+
       local ddr = View.prev_draw
       local ldr = love.draw
-      local ui = get_user_input()
-      if ldr ~= ddr or ui then
-        local function draw()
+      if ldr ~= ddr then
+        local draw =function()
           if ldr then
             wrap(ldr)
           end
-          local user_input = get_user_input()
-          if user_input then
-            user_input.V:draw()
+          local ui = get_user_input()
+          if ui then
+            ui.V:draw()
           end
         end
+
         View.prev_draw = draw
         love.draw = draw
       end
