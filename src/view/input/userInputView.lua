@@ -327,14 +327,14 @@ function UserInputView:render(input, status)
   local err_text = input.wrapped_error or {}
   local isError = string.is_non_empty_string_array(err_text)
 
-  gfx.setCanvas(self.canvas)
-  gfx.clear(0, 0, 0, 1)
-  if isError then
-    self:render_error(err_text)
-  else
-    self:render_input(input, status)
-  end
-  gfx.setCanvas()
+  self.canvas:renderTo(function ()
+      gfx.clear(0, 0, 0, 1)
+      if isError then
+        self:render_error(err_text)
+      else
+        self:render_input(input, status)
+      end
+  end)
 end
 
 --- Draw the pre-rendered canvas to screen
