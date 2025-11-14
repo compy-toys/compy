@@ -86,6 +86,7 @@ local config_view = function(flags)
   return {
     font = font_main,
     iconfont = font_icon,
+    statusline_border = 4,
     fh = fh,
     fw = fw,
     lh = lh,

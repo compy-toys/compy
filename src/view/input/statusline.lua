@@ -28,6 +28,8 @@ function Statusline:draw(status, start_y)
   local w = cf.w
   local fh = cf.fh
   local font = cf.font
+  local sb = cf.statusline_border
+  local corr = sb / 2
 
   local start_box = { x = 0, y = h }
   local endTextX = start_box.x + w - fh
@@ -36,9 +38,8 @@ function Statusline:draw(status, start_y)
   local function drawBackground()
     gfx.setColor(colors.bg)
     gfx.setFont(font)
-    --- correct for fractional slit left under the terminal
-    local corr = 2
-    gfx.rectangle("fill", start_box.x, start_box.y - corr, w, fh + corr)
+    gfx.rectangle("fill",
+      start_box.x, start_box.y - corr, w, fh + sb)
   end
 
   --- @param m More?
@@ -62,7 +63,7 @@ function Statusline:draw(status, start_y)
     local custom = status.custom
     local start_text = {
       x = start_box.x + fh,
-      y = start_box.y - 2,
+      y = start_box.y,
     }
 
     gfx.setColor(colors.fg)
@@ -73,7 +74,9 @@ function Statusline:draw(status, start_y)
     if love.DEBUG then
       gfx.setColor(cf.colors.debug)
       if love.state.testing then
-        gfx.print('testing', midX - (8 * cf.fw), start_text.y)
+        gfx.print('testing',
+          midX - (8 * cf.fw),
+          start_text.y + corr)
       end
       local lw = font:getWidth(state) / 2
       gfx.print((state or '???'),

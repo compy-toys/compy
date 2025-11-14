@@ -342,7 +342,8 @@ function UserInputView:draw()
   if not self.controller:is_oneshot() then
     self.controller:update_view()
   end
-  local h = self.start_h
+  local b = self.cfg.statusline_border / 2
+  local h = self.start_h - b
   gfx.push('all')
   gfx.setBlendMode("replace")
   love.graphics.draw(self.canvas, 0, h)
