@@ -71,7 +71,7 @@ function love.conf(t)
       frame = 0,
       n_frames = frames,
       n_rows = 7,
-      fpsc = 'T_R'
+      fpsc = 'T_R_B'
     }
   end
 

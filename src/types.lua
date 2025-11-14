@@ -169,9 +169,11 @@
 --- @field syntax_hl fun(table): SyntaxColoring
 
 ---@alias FPSC
----| 'off'
 ---| 'T_L"
 ---| 'T_R"
+---| 'off'
+---| 'T_L_B"
+---| 'T_R_B"
 
 --- @class Profile
 --- @field report table

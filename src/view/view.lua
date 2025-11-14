@@ -28,19 +28,31 @@ View = {
     if love.PROFILE.fpsc == 'off' then return end
 
     local fps = tostring(love.timer.getFPS())
+    local mode = love.PROFILE.fpsc
     local w = FPSfont:getWidth(fps)
+    local fh = FPSfont:getHeight()
+    local y = 10
     local x
-    if love.PROFILE.fpsc == 'T_L' then
+    if mode == 'T_L'
+        or mode == 'T_L_B'
+    then
       x = 10
-    elseif love.PROFILE.fpsc == 'T_R' then
+    elseif mode == 'T_R'
+        or mode == 'T_R_B'
+    then
       x = gfx.getWidth() - 10 - w
     end
     gfx.push('all')
     local prevCanvas = gfx.getCanvas()
     gfx.setCanvas()
+    if mode == 'T_L_B' or mode == 'T_R_B' then
+      gfx.setColor(Color[Color.black])
+      gfx.rectangle("fill",
+      x, y, w, fh - 5)
+    end
     gfx.setColor(Color[Color.yellow])
     gfx.setFont(FPSfont)
-    gfx.print(fps, x, 10)
+    gfx.print(fps, x, y)
     gfx.setCanvas(prevCanvas)
     gfx.pop()
   end

@@ -597,6 +597,10 @@ Controller = {
         end
         if k == "f10" then
           if love.PROFILE.fpsc == 'off' then
+            love.PROFILE.fpsc = 'T_L_B'
+          elseif love.PROFILE.fpsc == 'T_L_B' then
+            love.PROFILE.fpsc = 'T_R_B'
+          elseif love.PROFILE.fpsc == 'T_R_B' then
             love.PROFILE.fpsc = 'T_L'
           elseif love.PROFILE.fpsc == 'T_L' then
             love.PROFILE.fpsc = 'T_R'
