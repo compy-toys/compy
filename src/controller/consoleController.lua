@@ -311,18 +311,6 @@ function ConsoleController.prepare_env(cc)
   end
 
   --- @param name string
-  --- @return any
-  prepared.runfile          = function(name)
-    local code = check_open_pr(cc._readfile, cc, name)
-    local chunk, err = load(code, '', 't')
-    if chunk then
-      chunk()
-    else
-      print(err)
-    end
-  end
-
-  --- @param name string
   prepared.edit             = function(name)
     return check_open_pr(cc.edit, cc, name)
   end

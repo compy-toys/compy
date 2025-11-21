@@ -140,10 +140,6 @@ contents.
   Write to _file_ the text supplied as the _content_ parameter.
   This can be either a string, or an array of strings.
 
-- `runfile(file)`
-
-  Run _file_ if it's a lua script.
-
 ## Editor
 
 If a project is open, the files inside can be edited or new ones
