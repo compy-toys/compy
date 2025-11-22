@@ -7,37 +7,39 @@ end)
 
 
 --- @param status Status
---- @param nLines integer
---- @param time number?
-function Statusline:draw(status, nLines, time)
+--- @param start_y integer?
+function Statusline:draw(status, start_y)
   local gfx = love.graphics
   local cf = self.cfg
   local colors = (function()
-    if love.state.app_state == 'inspect' then
+    local state = love.state.app_state
+    if state == 'inspect' then
       return cf.colors.statusline.inspect
-    elseif love.state.app_state == 'running' then
+    elseif state == 'running' then
       return cf.colors.statusline.user
-    elseif love.state.app_state == 'editor' then
+    elseif state == 'editor' then
       return cf.colors.statusline.editor
     else
       return cf.colors.statusline.console
     end
   end)()
-  local h = cf.h
+
+  local h = start_y or 0
   local w = cf.w
   local fh = cf.fh
   local font = cf.font
+  local sb = cf.statusline_border
+  local corr = sb / 2
 
-  local sy = h - (1 + nLines) * fh
-  local start_box = { x = 0, y = sy }
+  local start_box = { x = 0, y = h }
   local endTextX = start_box.x + w - fh
   local midX = (start_box.x + w) / 2
 
   local function drawBackground()
     gfx.setColor(colors.bg)
     gfx.setFont(font)
-    local corr = 2 -- correct for fractional slit left under the terminal
-    gfx.rectangle("fill", start_box.x, start_box.y - corr, w, fh + corr)
+    gfx.rectangle("fill",
+      start_box.x, start_box.y - corr, w, fh + sb)
   end
 
   --- @param m More?
@@ -57,10 +59,11 @@ function Statusline:draw(status, nLines, time)
   end
 
   local function drawStatus()
+    local state = love.state.app_state
     local custom = status.custom
     local start_text = {
       x = start_box.x + fh,
-      y = start_box.y - 2,
+      y = start_box.y,
     }
 
     gfx.setColor(colors.fg)
@@ -71,13 +74,13 @@ function Statusline:draw(status, nLines, time)
     if love.DEBUG then
       gfx.setColor(cf.colors.debug)
       if love.state.testing then
-        gfx.print('testing', midX - (8 * cf.fw), start_text.y)
+        gfx.print('testing',
+          midX - (8 * cf.fw),
+          start_text.y + corr)
       end
-      gfx.print((love.state.app_state or '???'),
-        midX - (13 * cf.fw), start_text.y)
-      if time then
-        gfx.print(tostring(time), midX, start_text.y)
-      end
+      local lw = font:getWidth(state) / 2
+      gfx.print((state or '???'),
+        midX - lw, start_text.y)
       gfx.setColor(colors.fg)
     end
 

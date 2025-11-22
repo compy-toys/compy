@@ -1,3 +1,5 @@
+if not love or not love.graphics then return end
+
 require("util.string.string")
 
 --- @param cfg ViewConfig
@@ -196,12 +198,22 @@ local function draw_hl_text(text, highlight, cfg, options)
   end
 end
 
+--- @param canvas love.Canvas?
+local function screenshot(canvas)
+  if not love.DEBUG then return end
+  local cv = canvas or gfx.getCanvas()
+  local img = cv:newImageData()
+  local filename = os.time() .. ".png"
+  img:encode("png", filename)
+end
+
 ViewUtils = {
   get_drawable_height = get_drawable_height,
   write_line = write_line,
   write_token = write_token,
   draw_hl_text = draw_hl_text,
   conditional_draw = conditional_draw,
+  screenshot = screenshot,
 
   blendModes = blendModes,
 }

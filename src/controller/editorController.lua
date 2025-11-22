@@ -36,6 +36,11 @@ end
 --- @field mode EditorMode
 EditorController = class.create(new)
 
+--- @param v EditorView
+function EditorController:init_view(v)
+  self.view = v
+  self.input:init_view(self.view.input)
+end
 
 --- @param name string
 --- @param content str?
@@ -76,6 +81,7 @@ function EditorController:open(name, content, save)
   self.view:open(b)
   self:update_status()
   self:set_state()
+  self.input:update_view()
 end
 
 --- @private
@@ -279,6 +285,7 @@ end
 
 --- @param t string
 function EditorController:textinput(t)
+  self.view:update_input()
   if self.mode == 'edit' then
     local input = self.model.input
     if input:has_error() then
@@ -455,6 +462,7 @@ function EditorController:_search_mode_keys(k)
     return
   end
 
+  self.input:update_view()
   local jump = self.search:keypressed(k)
   if jump then
     local buf = self:get_active_buffer()
@@ -684,6 +692,7 @@ end
 
 --- @param k string
 function EditorController:keypressed(k)
+  self.input:update_view()
   local mode = self.mode
 
   if Key.ctrl() then

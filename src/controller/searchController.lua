@@ -3,10 +3,11 @@ local class = require('util.class')
 --- @param model Search
 --- @param uic UserInputController
 local function new(model, uic)
-  return {
+  local self = {
     model = model,
     input = uic,
   }
+  return self
 end
 
 --- @class SearchController
@@ -14,9 +15,16 @@ end
 --- @field input UserInputController
 SearchController = class.create(new)
 
+--- @param v SearchView
+function SearchController:init_view(v)
+  self.view = v
+  self.input:init_view(self.view.input)
+end
+
 --- @param items table[]
 function SearchController:load(items)
   self.model:load(items)
+  self.input:update_view()
 end
 
 --- @return ResultsDTO
@@ -64,12 +72,14 @@ end
 --- @param by integer?
 function SearchController:_scroll(dir, warp, by)
   self.model:scroll(dir, by, warp)
+  self.input:update_view()
   -- self:update_status() -- TODO: show more arrows
 end
 
 --- @param k string
 --- @return table? jump
 function SearchController:keypressed(k)
+  self.input:update_view()
   local function navigate()
     -- move selection
     if k == "up" then
@@ -127,6 +137,7 @@ end
 
 --- @param t string
 function SearchController:textinput(t)
+  self.input:update_view()
   self.input:add_text(t)
   self:update_results()
 end

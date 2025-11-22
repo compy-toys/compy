@@ -106,5 +106,5 @@ function History:_dump(f)
   end)
   local i = self.index or '-'
   local l = ' [' .. self:length() .. '] '
-  log(i .. l .. Debug.text_table(t, false, nil, 64))
+  log(i .. l .. Debug.text_table(t, false, nil, 64)  )
 end

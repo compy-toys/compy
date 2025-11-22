@@ -98,6 +98,36 @@ function table.protect(t, fields)
   return t, orig
 end
 
+--- Log set operations
+--- @param t table
+--- @param fields? table
+--- @return table prepared
+--- @return table original
+function table.logset(t, fields)
+  local orig = t
+  local proxy = {}
+
+  setmetatable(proxy, {
+    __newindex = function(_, k, v)
+      if not fields then
+        Log(string.format("%s = %s", k, v))
+      else
+        local fs = {}
+        for _, f in ipairs(fields) do
+          fs[f] = f
+        end
+        if fs[k] then
+          Log(string.format("%s = %s", k, v))
+        end
+      end
+      orig[k] = v
+    end,
+  })
+  -- getmetatable(proxy).__metatable = 'no-no'
+  t = proxy
+  return t, orig
+end
+
 --- @diagnostic disable-next-line: duplicate-set-field
 function table.pack(...)
   --- @class t

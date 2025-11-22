@@ -1,7 +1,7 @@
 require('util.table')
 require('util.string.string')
 
-local w = 64
+local wrap = 64
 
 local noop = function() end
 --- @param init str
@@ -20,17 +20,24 @@ local get_save_function = function(init)
   return save, handle
 end
 
+--- @param w integer?
+--- @param l integer?
+local function getMockConf(w, l)
+  return {
+    view = {
+      drawableChars = w or wrap,
+      lines = l or 16,
+      input_max = 14,
+      fh = 32,
+    },
+  }
+end
+
 return {
   get_save_function = get_save_function,
   noop = noop,
   LINES = 16,
   SCROLL_BY = 8,
-  w = w,
-  mock_view_cfg = {
-    view = {
-      drawableChars = w,
-      lines = 16,
-      input_max = 14
-    },
-  }
+  w = wrap,
+  mock_view_cfg = getMockConf,
 }

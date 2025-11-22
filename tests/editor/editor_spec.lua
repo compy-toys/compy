@@ -25,17 +25,6 @@ describe('Editor #editor', function()
     'Turtle graphics game inspired the LOGO family of languages.',
     '',
   }
-  --- @param w integer
-  --- @param l integer?
-  local function getMockConf(w, l)
-    return {
-      view = {
-        drawableChars = w,
-        lines = l or 16,
-        input_max = 14
-      },
-    }
-  end
 
   --- @param cfg Config
   --- @return EditorController
@@ -75,7 +64,7 @@ describe('Editor #editor', function()
   describe('opens', function()
     it('no wrap needed', function()
       local w = 80
-      local controller = wire(getMockConf(w))
+      local controller = wire(TU.mock_view_cfg(w))
 
       local save = TU.get_save_function(turtle_doc)
       controller:open('turtle', turtle_doc, save)
@@ -100,8 +89,7 @@ describe('Editor #editor', function()
       local w = 16
       love.state.app_state = 'editor'
 
-      local controller, press = wire(getMockConf(w))
-      local model = controller.model
+      local controller, press = wire(TU.mock_view_cfg(w))
 
       local save = TU.get_save_function(turtle_doc)
 
@@ -184,7 +172,7 @@ describe('Editor #editor', function()
     describe('with scroll', function()
       local l = 6
 
-      local controller, _, view = wire(getMockConf(80, l))
+      local controller, _, view = wire(TU.mock_view_cfg(80, l))
       local model = controller.model
 
       local save = TU.get_save_function(sierpinski)
@@ -238,7 +226,7 @@ describe('Editor #editor', function()
     describe('with scroll and wrap', function()
       local l = 6
 
-      local controller, _, view = wire(getMockConf(27, l))
+      local controller, _, view = wire(TU.mock_view_cfg(27, l))
 
       local save = TU.get_save_function(sierpinski)
       controller:open('sierpinski.txt', sierpinski, save)
@@ -439,9 +427,7 @@ describe('Editor #editor', function()
   --- end plaintext
 
   describe('structured (lua) works', function()
-    local l = 16
-
-    local controller, press = wire(getMockConf(64, l))
+    local controller, press = wire(TU.mock_view_cfg())
     local save, savefile = TU.get_save_function(sierpinski)
 
     controller:open('sierpinski.lua', sierpinski, save)

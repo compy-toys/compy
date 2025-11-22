@@ -63,6 +63,18 @@ function love.conf(t)
     love.TRACE = true
   end
 
+  if os.getenv("COMPY_PROF") then
+    print('DEBUG: initializing profiler')
+    local frames = os.getenv("FRAMES") or 50
+    love.PROFILE = {
+      reports = {},
+      frame = 0,
+      n_frames = frames,
+      n_rows = 7,
+      fpsc = 'T_R_B'
+    }
+  end
+
   t.identity = 'compy'
   t.window.resizable = false
 

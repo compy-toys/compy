@@ -1,3 +1,4 @@
+--- Conway's Game of Life
 --- original from https://github.com/Aethelios/Conway-s-Game-of-Life-in-Lua-and-Love2D
 
 gfx = love.graphics

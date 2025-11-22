@@ -42,6 +42,7 @@
 --- @class ViewConfig table
 --- @field font love.Font
 --- @field iconfont love.Font
+--- @field statusline_border integer
 --- @field fh integer -- font height
 --- @field fw integer -- font width
 --- @field lh integer -- line height
@@ -133,11 +134,12 @@
 
 --- @class LoveState table
 --- @field testing boolean
---- @field has_removable boolean
+--- @field has_removable boolean?
 --- @field user_input UserInput?
 --- @field app_state AppState
 --- @field prev_state AppState?
 --- @field editor EditorState?
+--- @field suspend_msg string?
 
 --- @class LoveDebug table
 --- @field show_snapshot boolean
@@ -166,3 +168,17 @@
 ---
 --- @field tokenize fun(str): table
 --- @field syntax_hl fun(table): SyntaxColoring
+
+---@alias FPSC
+---| 'T_L"
+---| 'T_R"
+---| 'off'
+---| 'T_L_B"
+---| 'T_R_B"
+
+--- @class Profile
+--- @field report table
+--- @field frame integer
+--- @field n_frames integer
+--- @field n_rows integer
+--- @field fpsc FPSC

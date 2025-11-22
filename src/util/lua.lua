@@ -31,6 +31,9 @@ local t = {
     end
   end,
   codeload = codeload,
+  b2s = function(b)
+    return b and '#t' or '#f'
+  end,
 }
 
 for k, v in pairs(t) do

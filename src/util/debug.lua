@@ -313,7 +313,7 @@ Debug = {
   --- @param t string[]?
   --- @param no_ln boolean?
   --- @param skip integer?
-  --- @param trunc boolean?
+  --- @param trunc number?
   --- @return string
   text_table = function(t, no_ln, skip, trunc)
     local res = '\n'

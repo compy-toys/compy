@@ -67,8 +67,10 @@ function ConsoleController.new(M, main_ctrl)
 end
 
 --- @param V ConsoleView
-function ConsoleController:set_view(V)
+function ConsoleController:init_view(V)
   self.view = V
+  self.input:init_view(V.input)
+  self.input:update_view()
 end
 
 --- @param name string
@@ -100,6 +102,10 @@ local function run_user_code(f, cc, project_path)
   end
   ok, call_err = pcall(f)
   if project_path and ok then -- user project exec
+    if love.PROFILE then
+      love.PROFILE.frame = 0
+      love.PROFILE.report = {}
+    end
     cc.main_ctrl.set_user_handlers(env['love'])
   end
   output:restore_main()
@@ -321,6 +327,28 @@ function ConsoleController.prepare_env(cc)
     cc:run_project(name)
   end
 
+  local terminal            = cc.model.output.terminal
+  local compy_namespace     = {
+    terminal = {
+      --- @param x number
+      --- @param y number
+      gotoxy = function(x, y)
+        return terminal:move_to(x, y)
+      end,
+      show_cursor = function()
+        return terminal:show_cursor()
+      end,
+      hide_cursor = function()
+        return terminal:hide_cursor()
+      end,
+      clear = function()
+        return terminal:clear()
+      end
+    }
+  }
+  prepared.compy            = compy_namespace
+  prepared.tty              = compy_namespace.terminal
+
   prepared.run              = prepared.run_project
 
   prepared.eval             = LANG.eval
@@ -342,24 +370,24 @@ function ConsoleController.prepare_project_env(cc)
   require("controller.userInputController")
   require("model.input.userInputModel")
   require("view.input.userInputView")
-  local cfg            = cc.model.cfg
+  local cfg                   = cc.model.cfg
   ---@type table
-  local project_env    = cc:get_pre_env_c()
-  project_env.gfx      = love.graphics
+  local project_env           = cc:get_pre_env_c()
+  project_env.gfx             = love.graphics
 
-  project_env.require  = function(name)
+  project_env.require         = function(name)
     return project_require(cc, name)
   end
 
   --- @param msg string?
-  project_env.pause    = function(msg)
+  project_env.pause           = function(msg)
     cc:suspend_run(msg)
   end
-  project_env.stop     = function()
+  project_env.stop            = function()
     cc:stop_project_run()
   end
 
-  project_env.continue = function()
+  project_env.continue        = function()
     if love.state.app_state == 'inspect' then
       -- resume
       love.state.app_state = 'running'
@@ -373,7 +401,7 @@ function ConsoleController.prepare_project_env(cc)
     close_project(cc)
   end
 
-  local ui_model, input_ref
+  local ui_model, ui_con, input_ref
   local create_input_handle   = function()
     input_ref = table.new_reftable()
   end
@@ -389,10 +417,13 @@ function ConsoleController.prepare_project_env(cc)
     if not input_ref then return end
     ui_model = UserInputModel(cfg, eval, true, prompt)
     ui_model:set_text(init)
-    local inp_con = UserInputController(ui_model, input_ref, true)
-    local view = UserInputView(cfg.view, inp_con)
+    ui_con = UserInputController(ui_model, input_ref, true)
+    local view = UserInputView(cfg.view, ui_con)
+    ui_con:init_view(view)
+    ui_con:update_view()
+
     love.state.user_input = {
-      M = ui_model, C = inp_con, V = view
+      M = ui_model, C = ui_con, V = view
     }
     return input_ref
   end
@@ -419,6 +450,7 @@ function ConsoleController.prepare_project_env(cc)
       return
     end
     ui_model:set_text(content)
+    ui_con:update_view()
   end
 
   --- @param filters table
@@ -546,22 +578,32 @@ function ConsoleController:_set_base_env(t)
   table.protect(t)
 end
 
---- @param msg string?
-function ConsoleController:suspend_run(msg)
-  local runner_env = self:get_project_env()
-  if love.state.app_state ~= 'running' then
+function ConsoleController:suspend()
+  if love.state.app_state ~= 'snapshot' then
     return
   end
+  local runner_env = self:get_project_env()
   Log.info('Suspending project run')
   love.state.app_state = 'inspect'
+  local msg = love.state.suspend_msg
   if msg then
     self.input:set_error({ tostring(msg) })
+    love.state.suspend_msg = nil
   end
 
   self.model.output:invalidate_terminal()
 
   self.main_ctrl.save_user_handlers(runner_env['love'])
   self.main_ctrl.set_default_handlers(self, self.view)
+end
+
+--- @param msg string?
+function ConsoleController:suspend_run(msg)
+  if love.state.app_state ~= 'running' then
+    return
+  end
+  love.state.app_state = 'snapshot'
+  love.state.suspend_msg = msg
 end
 
 --- @param name string
@@ -629,6 +671,7 @@ function ConsoleController:stop_project_run()
   View.clear_snapshot()
   self.main_ctrl.set_love_draw(self, self.view)
   self.main_ctrl.clear_user_handlers()
+  self.main_ctrl.report()
   love.state.app_state = 'project_open'
 end
 
@@ -781,11 +824,13 @@ function ConsoleController:keypressed(k)
       end
     end
   end
+  input:update_view()
 end
 
 --- @param k string
 function ConsoleController:keyreleased(k)
   self.input:keyreleased(k)
+  self.input:update_view()
 end
 
 --- @param x integer
