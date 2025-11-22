@@ -8,6 +8,9 @@ local messages = {
   user_break = "BREAK into program",
   exit_anykey = "Press any key to exit.",
   exec_error = function(err)
+    Log.error((debug.traceback(
+      "Error: " .. tostring(err), 1):gsub("\n[^\n]+$", "")
+    ))
     return 'Execution error at ' .. err
   end
 }
@@ -376,7 +379,11 @@ Controller = {
           end
           local user_input = get_user_input()
           if user_input then
-            user_input.V:draw(user_input.C:get_input(), C.time)
+            if love.DEBUG then
+              user_input.V:draw(user_input.C:get_input(), C.time)
+            else
+              user_input.V:draw(user_input.C:get_input())
+            end
           end
         end
         View.prev_draw = draw
@@ -416,11 +423,11 @@ Controller = {
     View.prev_draw = love.draw
     View.main_draw = love.draw
     View.end_draw = function()
-      local w, h = G.getDimensions()
-      G.setColor(Color[Color.white])
-      G.setFont(C.cfg.view.font)
-      G.clear()
-      G.printf(messages.exit_anykey, 0, h / 3, w, "center")
+      local w, h = gfx.getDimensions()
+      gfx.setColor(Color[Color.white])
+      gfx.setFont(C.cfg.view.font)
+      gfx.clear()
+      gfx.printf(messages.exit_anykey, 0, h / 3, w, "center")
     end
   end,
 
@@ -521,7 +528,7 @@ Controller = {
 
     handlers.keypressed = function(k)
       local function quickswitch()
-        if k == 'f8' then
+        if Key.ctrl() and k == 't' then
           if love.state.app_state == 'running'
               or love.state.app_state == 'inspect'
               or love.state.app_state == 'project_open'
@@ -556,7 +563,7 @@ Controller = {
               if love.state.app_state == 'running' then
                 C:stop_project_run()
               elseif love.state.app_state == 'editor' then
-                C:finish_edit()
+                C:close_buffer()
               end
             end
             if k == "r" then

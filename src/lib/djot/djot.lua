@@ -60,7 +60,7 @@ end
 --- @param sourcepos (boolean?) if true, source positions are included in the AST
 --- @param warn (function?) function that processes a warning, accepting a warning
 --- object with `pos` and `message` fields.
---- @return (AST)
+--- @return (djotAST)
 local function parse(input, sourcepos, warn)
   local parser = Parser:new(input, warn)
   return ast.to_ast(parser, sourcepos or false)
@@ -82,7 +82,7 @@ local function parse_events(input, warn)
 end
 
 --- Render a document's AST in human-readable form.
---- @param doc (AST) the AST
+--- @param doc (djotAST) the AST
 --- @return (string) rendered AST
 local function render_ast_pretty(doc)
   local handle = StringHandle:new()
@@ -91,14 +91,14 @@ local function render_ast_pretty(doc)
 end
 
 --- Render a document's AST in JSON.
---- @param doc (AST) the AST
+--- @param doc (djotAST) the AST
 --- @return (string) rendered AST (JSON string)
 local function render_ast_json(doc)
   return json.encode(doc) .. "\n"
 end
 
 --- Render a document as HTML.
---- @param doc (AST) the AST
+--- @param doc (djotAST) the AST
 --- @return (string) rendered document (HTML string)
 local function render_html(doc)
   local handle = StringHandle:new()

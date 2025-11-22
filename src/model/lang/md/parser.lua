@@ -69,7 +69,7 @@ end
 
 --- @param input str
 --- @param skip_posinfo boolean?
---- @return AST -- djot AST, distinct from metalua
+--- @return djotAST
 local function parse(input, skip_posinfo)
   local text = string.unlines(input)
   local posinfo = not (skip_posinfo == true)

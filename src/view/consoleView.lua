@@ -8,7 +8,7 @@ require("util.color")
 require("util.view")
 require("util.debug")
 
-local G = love.graphics
+local gfx = love.graphics
 
 --- @param cfg Config
 --- @param ctrl ConsoleController
@@ -73,15 +73,15 @@ function ConsoleView:draw_placeholder()
   local band = self.cfg.view.fh
   local w    = self.cfg.view.w
   local h    = self.cfg.view.h
-  G.push('all')
-  G.setColor(Color[Color.yellow])
+  gfx.push('all')
+  gfx.setColor(Color[Color.yellow])
   for o = -h, w, 2 * band do
-    G.polygon("fill"
+    gfx.polygon("fill"
     , o + 0, h
     , o + h, 0
     , o + h + band, 0
     , o + band, h
     )
   end
-  G.pop()
+  gfx.pop()
 end

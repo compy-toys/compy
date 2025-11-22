@@ -104,7 +104,7 @@ local function traverse(node, filterpart)
 end
 
 --- Apply a filter to a document.
---- @param node (AST)
+--- @param node (djotAST)
 --- @param filter table the filter to apply
 local function apply_filter(node, filter)
   for _, filterpart in ipairs(filter) do

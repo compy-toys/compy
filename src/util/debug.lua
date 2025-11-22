@@ -122,6 +122,10 @@ local function terse_hash(t, level, prev_seen, jsonify)
   return res
 end
 
+local function nontable(t)
+  return '(not a table) ' .. tostring(t)
+end
+
 --- @param a table?
 --- @param skip integer?
 local function terse_array(a, skip)
@@ -142,7 +146,7 @@ local function terse_array(a, skip)
 
     return res
   else
-    return ''
+    return nontable(a)
   end
 end
 
@@ -154,7 +158,9 @@ end
 --- @param style dumpstyle?
 --- @return string
 local function terse_ast(ast, skip_lineinfo, style)
-  if type(ast) ~= 'table' then return '' end
+  if type(ast) ~= 'table' then
+    return nontable(ast)
+  end
   local style = style or 'json5'
 
   --- @param t table?
@@ -516,7 +522,7 @@ Log = {
   once = once,
 
   fire_once = function()
-    if not love.DEBUG then return end
+    if not love or not love.DEBUG then return end
     love.debug.once = love.debug.once + 1
   end,
   --- @param color integer

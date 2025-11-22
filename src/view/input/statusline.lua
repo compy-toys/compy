@@ -10,7 +10,7 @@ end)
 --- @param nLines integer
 --- @param time number?
 function Statusline:draw(status, nLines, time)
-  local G = love.graphics
+  local gfx = love.graphics
   local cf = self.cfg
   local colors = (function()
     if love.state.app_state == 'inspect' then
@@ -34,10 +34,10 @@ function Statusline:draw(status, nLines, time)
   local midX = (start_box.x + w) / 2
 
   local function drawBackground()
-    G.setColor(colors.bg)
-    G.setFont(font)
+    gfx.setColor(colors.bg)
+    gfx.setFont(font)
     local corr = 2 -- correct for fractional slit left under the terminal
-    G.rectangle("fill", start_box.x, start_box.y - corr, w, fh + corr)
+    gfx.rectangle("fill", start_box.x, start_box.y - corr, w, fh + corr)
   end
 
   --- @param m More?
@@ -63,21 +63,22 @@ function Statusline:draw(status, nLines, time)
       y = start_box.y - 2,
     }
 
-    G.setColor(colors.fg)
+    gfx.setColor(colors.fg)
     local label = status.label
     if label then
-      G.print(label, start_text.x, start_text.y)
+      gfx.print(label, start_text.x, start_text.y)
     end
     if love.DEBUG then
-      G.setColor(cf.colors.debug)
+      gfx.setColor(cf.colors.debug)
       if love.state.testing then
-        G.print('testing', midX - (8 * cf.fw), start_text.y)
+        gfx.print('testing', midX - (8 * cf.fw), start_text.y)
       end
-      G.print(love.state.app_state, midX - (13 * cf.fw), start_text.y)
+      gfx.print((love.state.app_state or '???'),
+        midX - (13 * cf.fw), start_text.y)
       if time then
-        G.print(tostring(time), midX, start_text.y)
+        gfx.print(tostring(time), midX, start_text.y)
       end
-      G.setColor(colors.fg)
+      gfx.setColor(colors.fg)
     end
 
     local c = status.cursor
@@ -98,50 +99,50 @@ function Statusline:draw(status, nLines, time)
         local more_b = morelabel(custom.buffer_more) .. ' '
         local more_i = morelabel(status.input_more) .. ' '
 
-        G.setColor(colors.fg)
-        local w_il  = G.getFont():getWidth(" 999:9999")
-        local w_br  = G.getFont():getWidth("B999 L999-999(99)")
-        local w_mb  = G.getFont():getWidth(" ↕↕ ")
-        local w_mi  = G.getFont():getWidth("  ↕↕ ")
+        gfx.setColor(colors.fg)
+        local w_il  = gfx.getFont():getWidth(" 999:9999")
+        local w_br  = gfx.getFont():getWidth("B999 L999-999(99)")
+        local w_mb  = gfx.getFont():getWidth(" ↕↕ ")
+        local w_mi  = gfx.getFont():getWidth("  ↕↕ ")
         local s_mb  = endTextX - w_br - w_il - w_mi - w_mb
-        local cw_p  = G.getFont():getWidth(t_blp)
-        local cw_il = G.getFont():getWidth(t_ic)
+        local cw_p  = gfx.getFont():getWidth(t_blp)
+        local cw_il = gfx.getFont():getWidth(t_ic)
         local sxl   = endTextX - (cw_p + w_il + w_mi)
         local s_mi  = endTextX - w_il
 
 
-        G.setFont(self.cfg.font)
-        G.setColor(colors.fg)
-        if colors.fg2 then G.setColor(colors.fg2) end
+        gfx.setFont(self.cfg.font)
+        gfx.setColor(colors.fg)
+        if colors.fg2 then gfx.setColor(colors.fg2) end
         --- cursor pos
-        G.print(t_ic, endTextX - cw_il, start_text.y)
+        gfx.print(t_ic, endTextX - cw_il, start_text.y)
         --- input more
-        G.print(more_i, s_mi, start_text.y - 3)
+        gfx.print(more_i, s_mi, start_text.y - 3)
 
-        G.setColor(colors.fg)
+        gfx.setColor(colors.fg)
         if custom.mode == 'reorder'
             and custom.content_type == 'plain' then
-          G.setColor(colors.special)
+          gfx.setColor(colors.special)
         end
         --- block line range / line
-        G.print(t_blp, sxl, start_text.y)
-        G.setColor(colors.fg)
+        gfx.print(t_blp, sxl, start_text.y)
+        gfx.setColor(colors.fg)
         --- block number
         if custom.content_type == 'lua' then
-          local bpw = G.getFont():getWidth(t_bbp)
+          local bpw = gfx.getFont():getWidth(t_bbp)
           local sxb = sxl - bpw
           if sel == lim then
-            G.setColor(colors.indicator)
+            gfx.setColor(colors.indicator)
           end
           if custom.mode == 'reorder' then
-            G.setColor(colors.special)
+            gfx.setColor(colors.special)
           end
-          G.print(t_bbp, sxb, start_text.y)
+          gfx.print(t_bbp, sxb, start_text.y)
         end
 
         --- buffer more
-        G.setColor(colors.fg)
-        G.print(more_b, s_mb, start_text.y)
+        gfx.setColor(colors.fg)
+        gfx.print(more_b, s_mb, start_text.y)
       else
         --- normal statusline
         local pos_c = ':' .. c.c
@@ -154,22 +155,22 @@ function Statusline:draw(status, nLines, time)
           l_lim = status.n_lines
         end
         if ln == l_lim then
-          G.setColor(colors.indicator)
+          gfx.setColor(colors.indicator)
         end
         local pos_l = 'L' .. ln
 
-        local lw = G.getFont():getWidth(pos_l)
-        local cw = G.getFont():getWidth(pos_c)
+        local lw = gfx.getFont():getWidth(pos_l)
+        local cw = gfx.getFont():getWidth(pos_c)
         local sx = endTextX - (lw + cw)
-        G.print(pos_l, sx, start_text.y)
-        G.setColor(colors.fg)
-        G.print(pos_c, sx + lw, start_text.y)
+        gfx.print(pos_l, sx, start_text.y)
+        gfx.setColor(colors.fg)
+        gfx.print(pos_c, sx + lw, start_text.y)
       end
     end
   end
 
-  G.push('all')
+  gfx.push('all')
   drawBackground()
   drawStatus()
-  G.pop()
+  gfx.pop()
 end

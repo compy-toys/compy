@@ -82,6 +82,7 @@ a project must be selected first.
 | Search definitions                                                | <kbd>Ctrl</kbd>+<kbd>F</kbd>                  |
 | Exit search                                                       | <kbd>Esc</kbd>                                |
 | Jump to selected definition                                       | <kbd>Enter ⏎</kbd>                            |
+| Edit required file / return to previous                           | <kbd>Ctrl</kbd>+<kbd>O</kbd>                  |
 
 ## Projects
 
@@ -160,7 +161,7 @@ To modify an existing line, navigate there with
 ![capitalized](./doc/interface/hello_cap.apng)
 
 Happy with the modifications now, we can quit by pressing
-<kbd>Ctrl-Shift-Q</kbd>
+<kbd>Ctrl-Shift-S</kbd>
 
 ![quit](./doc/interface/quit_editor.apng)
 

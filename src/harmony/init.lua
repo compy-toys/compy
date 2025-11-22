@@ -83,10 +83,10 @@ local function new(_lock)
         if love.update then love.update(dt) end
 
         if love.graphics and love.graphics.isActive() then
-          local G = love.graphics
-          G.origin()
-          G.clear(
-            G.getBackgroundColor()
+          local gfx = love.graphics
+          gfx.origin()
+          gfx.clear(
+            gfx.getBackgroundColor()
           )
 
           if love.draw then love.draw() end
@@ -150,7 +150,7 @@ local function utils()
   if not love.harmony then return end
   if love.harmony.utils then return end
 
-  G = love.graphics
+  local gfx = love.graphics
 
   --- @param name love.Event
   local love_event = function(name, ...)
@@ -182,6 +182,9 @@ local function utils()
     lgui   = false,
     rgui   = false,
   }
+  local shortcuts = {
+    toggle = 'C-t'
+  }
 
 
   --- @param tag string
@@ -203,7 +206,7 @@ local function utils()
 
     FS.mkdirp(dir)
     --- @param img_data love.ImageData
-    G.captureScreenshot(function(img_data)
+    gfx.captureScreenshot(function(img_data)
       if img_data then
         local from = FS.join_path(
           love.filesystem.getSaveDirectory(), fn
@@ -234,6 +237,7 @@ local function utils()
   --- @field love_text function
   --- @field screenshot function
   --- @field release_keys function
+  --- @field shortcuts table
   return {
     patch_isDown = function()
       local down = love.keyboard.isDown
@@ -290,6 +294,8 @@ local function utils()
     end,
 
     release_keys = release_keys,
+
+    shortcuts = shortcuts,
 
     screenshot = function(tag)
       timer:script(function(wait)
@@ -362,6 +368,7 @@ local function runner()
       end)
 
       scrun = coroutine.create(function()
+        -- timer = Timer.new()
         for _, v in ipairs(scenarios) do
           local tag = v.id
           local sc = v.sc

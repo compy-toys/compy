@@ -29,11 +29,11 @@ For the most simple example of this, let's represent the turtle with only an ell
 local x_r = 15
 local y_r = 20
 function turtleA(x, y)
-  G.ellipse("fill", x, y, x_r, y_r, 100)
+  gfx.ellipse("fill", x, y, x_r, y_r, 100)
 end
 function turtleB(x, y)
-  G.translate(x, y)
-  G.ellipse("fill", 0, 0, x_r, y_r, 100)
+  gfx.translate(x, y)
+  gfx.ellipse("fill", 0, 0, x_r, y_r, 100)
 end
 ```
 We can draw it at (x, y) either by drawing the shape to (x, y), or first translating the whole drawing to (x, y), and drawing at (0, 0). This might not seem that big of a deal in this simple case, but when the number of transformations and shapes go up, things cat get hard to track very quickly.
@@ -45,7 +45,7 @@ The way we translate this for LOVE is an "x radius" and a "y radius". <br />In o
 
 Next, we are adding the turtle's head, which is in some sort of relation to it's body, but also the location where the whole drawing is.
 ```lua
-G.circle("fill", 0, ((0 - y_r) - head_r) + neck, head_r, 100)
+gfx.circle("fill", 0, ((0 - y_r) - head_r) + neck, head_r, 100)
 ```
 Using the second method, we are able to provide the head position in "turtle coordinates".
 So far, there's nothing about this we couldn't have done the other route, but let's proceed to the legs, which we want to draw at an angle. LOVE doesn't provide us any way to do this with only the ellipse function, we do need to `rotate` first.
@@ -53,15 +53,15 @@ So far, there's nothing about this we couldn't have done the other route, but le
 See this condensed example:
 ```lua
 function frontLeftLeg(x, y, x_r, y_r, leg_xr, leg_yr)
-  G.setColor(Color[Color.green + Color.bright])
+  gfx.setColor(Color[Color.green + Color.bright])
   --- move to the turtle's position
-  G.translate(x, y)
+  gfx.translate(x, y)
   --- move to where the leg attaches to the body
-  G.translate(-x_r, -y_r / 2 - leg_xr)
+  gfx.translate(-x_r, -y_r / 2 - leg_xr)
   --- rotate
-  G.rotate(-math.pi / 4)
+  gfx.rotate(-math.pi / 4)
   --- draw the leg
-  G.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
+  gfx.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
 end
 ```
 
@@ -77,17 +77,17 @@ You will notice that the actual code does not look like that. For one, in the le
 Another, more interesting difference is the `push()` - `pop()` pairs around each leg.
 ```lua
 --- left front leg
-G.push("all")
-G.translate(-x_r, -y_r / 2 - leg_xr)
-G.rotate(-math.pi / 4)
-G.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
-G.pop()
+gfx.push("all")
+gfx.translate(-x_r, -y_r / 2 - leg_xr)
+gfx.rotate(-math.pi / 4)
+gfx.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
+gfx.pop()
 --- right front leg
-G.push("all")
-G.translate(x_r, -y_r / 2 - leg_xr)
-G.rotate(math.pi / 4)
-G.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
-G.pop()
+gfx.push("all")
+gfx.translate(x_r, -y_r / 2 - leg_xr)
+gfx.rotate(math.pi / 4)
+gfx.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
+gfx.pop()
 ```
 Say we are done drawing the left leg, and now we want to proceed to drawing the other one. We could do the opposite transformations to go back to "zero", or transform from our current state to the desired one, but that leads to more complicated math and less readable code.
 Instead, we work in stages. When done with the first leg, we can "reset" to our previous state (the "turtle coordinates"), and set up our next one again relative to the center.

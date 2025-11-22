@@ -1,12 +1,12 @@
 --- original from https://github.com/Aethelios/Conway-s-Game-of-Life-in-Lua-and-Love2D
 
-G = love.graphics
-G.setFont(font)
+gfx = love.graphics
+gfx.setFont(font)
 fh = font:getHeight()
 
 cell_size = 10
 margin = 5
-screen_w, screen_h = G.getDimensions()
+screen_w, screen_h = gfx.getDimensions()
 grid_w = screen_w / cell_size
 grid_h = screen_h / cell_size
 grid = {}
@@ -146,22 +146,22 @@ function drawHelp()
   local right_edge = screen_w - margin
   local reset_msg = "Reset: [r] key or long press"
   local speed_msg = "Set speed: [+]/[-] key or drag up/down"
-  G.print(reset_msg, margin, (bottom - fh) - fh)
-  G.print(speed_msg, margin, bottom - fh)
+  gfx.print(reset_msg, margin, (bottom - fh) - fh)
+  gfx.print(speed_msg, margin, bottom - fh)
   local speed_label = string.format("Speed: %02d", speed)
   local label_w = font:getWidth(speed_label)
-  G.print(speed_label, right_edge - label_w, bottom - fh)
+  gfx.print(speed_label, right_edge - label_w, bottom - fh)
 end
 
 function drawCell(x, y)
-  G.setColor(.9, .9, .9)
-  G.rectangle('fill',
+  gfx.setColor(.9, .9, .9)
+  gfx.rectangle('fill',
     (x - 1) * cell_size,
     (y - 1) * cell_size,
     cell_size, cell_size)
-  G.setColor(.3, .3, .3)
+  gfx.setColor(.3, .3, .3)
 
-  G.rectangle('line',
+  gfx.rectangle('line',
     (x - 1) * cell_size,
     (y - 1) * cell_size,
     cell_size, cell_size)
@@ -176,7 +176,7 @@ function love.draw()
     end
   end
 
-  G.setColor(1, 1, 1, 0.5)
+  gfx.setColor(1, 1, 1, 0.5)
   drawHelp()
 end
 

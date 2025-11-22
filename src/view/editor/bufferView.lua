@@ -15,12 +15,12 @@ local function new(cfg)
     cfg = cfg,
     LINES = l,
     SCROLL_BY = math.floor(l / 2),
-    w = cfg.drawableChars,
+    wrap_w = cfg.drawableChars,
 
     content = nil,
     content_type = nil,
     more = { up = false, down = false },
-    offset = 0,
+
     buffer = nil
   }
 end
@@ -28,12 +28,12 @@ end
 --- @class BufferView : ViewBase
 --- @field content VisibleContent|VisibleStructuredContent
 --- @field content_type ContentType
---- @field buffer BufferModel
+--- @field buffers Dequeue<BufferModel>
 ---
+--- @field cfg ViewConfig
 --- @field LINES integer
 --- @field SCROLL_BY integer
---- @field w integer
---- @field offset integer
+--- @field wrap_w integer
 --- @field more More
 ---
 --- @field open function
@@ -53,32 +53,31 @@ function BufferView:open(buffer)
   if not self.buffer then
     error('no buffer')
   end
-  local cont = buffer.content_type
-  self.content_type = cont
+  local ct = buffer.content_type
+  self.content_type = ct
 
-  if cont == 'plain' or cont == 'md' then
+  if ct == 'plain' or ct == 'md' then
     local bufcon = buffer:get_text_content()
     self.buffer:highlight()
     self.content = VisibleContent(
-      self.w, bufcon, self.SCROLL_BY, L)
+      self.wrap_w, bufcon, self.SCROLL_BY, L)
     self.hl = self.buffer:get_highlight()
-  elseif cont == 'lua' then
+  elseif ct == 'lua' then
     local bufcon = buffer:get_content()
     self.content =
-        VisibleStructuredContent(
-          self.w,
+        VisibleStructuredContent({
+            wrap_w = self.wrap_w,
+            overscroll_max = self.SCROLL_BY,
+            size_max = L,
+            cfg = self.cfg,
+          },
           bufcon,
-          buffer.highlighter,
-          self.SCROLL_BY,
-          L)
+          buffer.highlighter)
   else
     error 'unknown filetype'
   end
 
-  -- TODO clean this up
-  local clen = self.content:get_text_length()
-  self.offset = math.max(clen - L, 0)
-  local off = self.offset
+  local off = self.content.offset
   if off > 0 then
     self.more.up = true
   end
@@ -118,7 +117,7 @@ function BufferView:get_state()
   return {
     filename = buf.name,
     selection = buf.selection,
-    offset = self.offset,
+    offset = self.content.offset,
   }
 end
 
@@ -139,7 +138,7 @@ function BufferView:refresh(moved)
     local sel = self.buffer:get_selection()
     if self.content_type == 'lua' then
       local vsc = self.content
-      local blocks = vsc.blocks
+      local blocks = vsc.v_blocks
       blocks:move(moved, sel)
       vsc:recalc_range()
     else
@@ -150,7 +149,7 @@ function BufferView:refresh(moved)
   end
 
   local clen = self.content:get_content_length()
-  local off = self.offset
+  local off = self.content.offset
   local si = 1 + off
   local ei = math.min(self.LINES, clen + 1) + off
   self:_update_visible(Range(si, ei))
@@ -159,6 +158,11 @@ end
 -------------------
 ---  scrolling  ---
 -------------------
+
+--- @return integer
+function BufferView:get_offset()
+  return self.content.offset
+end
 
 --- @private
 --- @return Range
@@ -190,8 +194,7 @@ function BufferView:scroll(dir, by, warp)
       end
     end
   end)()
-  local o = self.content:move_range(n)
-  self.offset = self.offset + o
+  self.content:move_range(n)
 end
 
 --- @param off integer
@@ -253,9 +256,13 @@ function BufferView:follow_selection()
   end
 end
 
+--------------
+---  draw  ---
+--------------
+
 --- @param special boolean
 function BufferView:draw(special)
-  local G = love.graphics
+  local gfx = love.graphics
   local cf_colors = self.cfg.colors
   local colors = cf_colors.editor
   local font = self.cfg.font
@@ -265,17 +272,17 @@ function BufferView:draw(special)
   --- @type VisibleContent|VisibleStructuredContent
   local content_text = vc:get_visible()
   local last_line_n = #content_text
-  local width, height = G.getDimensions()
+  local width, height = gfx.getDimensions()
 
 
   local draw_background = function()
-    G.push('all')
-    G.setColor(colors.bg)
-    G.rectangle("fill", 0, 0, width, height)
-    G.setColor(Color.with_alpha(colors.fg, .0625))
+    gfx.push('all')
+    gfx.setColor(colors.bg)
+    gfx.rectangle("fill", 0, 0, width, height)
+    gfx.setColor(Color.with_alpha(colors.fg, .0625))
     local bh = math.min(last_line_n, self.cfg.lines) * fh
-    G.rectangle("fill", 0, 0, width, bh)
-    G.pop()
+    gfx.rectangle("fill", 0, 0, width, bh)
+    gfx.pop()
   end
 
   local draw_highlight = function()
@@ -284,19 +291,19 @@ function BufferView:draw(special)
     local highlight_line = function(ln)
       if not ln then return end
       if special then
-        G.setColor(colors.highlight_special)
+        gfx.setColor(colors.highlight_special)
       else
         if ls then
-          G.setColor(colors.highlight_loaded)
+          gfx.setColor(colors.highlight_loaded)
         else
-          G.setColor(colors.highlight)
+          gfx.setColor(colors.highlight)
         end
       end
       local l_y = (ln - 1) * fh
-      G.rectangle('fill', 0, l_y, width, fh)
+      gfx.rectangle('fill', 0, l_y, width, fh)
     end
 
-    local off = self.offset
+    local off = self.content.offset
     for _, w in ipairs(ws) do
       for _, v in ipairs(w) do
         if self.content.range:inc(v) then
@@ -313,7 +320,7 @@ function BufferView:draw(special)
   end
 
   local draw_text = function()
-    G.setFont(font)
+    gfx.setFont(font)
     if self.content_type == 'lua' then
       local vbl = vc:get_visible_blocks()
       for _, block in ipairs(vbl) do
@@ -323,7 +330,7 @@ function BufferView:draw(special)
         local text = wt:get_text()
         local highlight = { hl = block.highlight }
         local ltf = function(l)
-          return l + rs - 1 - self.offset
+          return l + rs - 1 - self.content.offset
         end
         local ctf = function(a) return a end
         local limit = self.cfg.lines
@@ -337,9 +344,9 @@ function BufferView:draw(special)
 
       if love.DEBUG then
         --- phantom text
-        G.setColor(Color.with_alpha(colors.fg, 0.3))
+        gfx.setColor(Color.with_alpha(colors.fg, 0.3))
         local text = string.unlines(content_text)
-        G.print(text)
+        gfx.print(text)
       end
     elseif self.content_type == 'md' then
       local text      = vc:get_visible()
@@ -357,10 +364,10 @@ function BufferView:draw(special)
         ltf = ltf, ctf = ctf, limit = limit,
       })
     elseif self.content_type == 'plain' then
-      G.setColor(colors.fg)
+      gfx.setColor(colors.fg)
       local text = string.unlines(content_text)
 
-      G.print(text)
+      gfx.print(text)
     end
   end
 
@@ -370,24 +377,24 @@ function BufferView:draw(special)
     local lnc = colors.fg
     local x = self.cfg.w - font:getWidth('   ') - 3
     local lnvc = Color.with_alpha(lnc, 0.2)
-    G.setColor(lnvc)
-    G.rectangle("fill", x, 0, 2, self.cfg.h)
+    gfx.setColor(lnvc)
+    gfx.rectangle("fill", x, 0, 2, self.cfg.h)
     local seen = {}
     for ln = 1, self.LINES do
       local l_y = (ln - 1) * fh
-      local vln = ln + self.offset
+      local vln = ln + self.content.offset
       local ln_w = self.content.wrap_reverse[vln]
       if ln_w then
         local l = string.format('%3d', ln_w)
         local l_x = self.cfg.w - font:getWidth(l)
         local l_xv = l_x - font:getWidth(l) - 3.5
         if showap then
-          G.setColor(lnvc)
-          G.print(string.format('%3d', vln), l_xv, l_y)
+          gfx.setColor(lnvc)
+          gfx.print(string.format('%3d', vln), l_xv, l_y)
         end
         if not seen[ln_w] then
-          G.setColor(lnc)
-          G.print(l, l_x, l_y)
+          gfx.setColor(lnc)
+          gfx.print(l, l_x, l_y)
           seen[ln_w] = true
         end
       end

@@ -48,7 +48,7 @@ end
 --- @param s string[]
 --- @return boolean ok
 --- @return str content|errpr
---- @return AST? ast
+--- @return luaAST? ast
 local function default_apply(self, s)
   local valid, errors = validate(self, s)
   local parser = self.parser

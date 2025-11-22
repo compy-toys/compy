@@ -281,6 +281,17 @@ function table.find_by(self, pred)
   end
 end
 
+--- Find first element that the predicate holds for
+--- @param self table[]
+--- @param pred function
+--- @return any?
+function table.find_by_v(self, pred)
+  if not self or not pred then return end
+  for _, v in pairs(self) do
+    if pred(v) then return v end
+  end
+end
+
 --- Filter elements that satisfy the predicate
 --- enumerates sequentially
 --- @param self table[]
@@ -349,6 +360,30 @@ function table.map(self, f)
   local ret = {}
   for k, v in pairs(self) do
     ret[k] = f(v)
+  end
+  return ret
+end
+
+--- Tabulate array values with index (returns new table)
+--- @param self table
+--- @param f function
+--- @return table
+function table.imap(self, f)
+  local ret = {}
+  for i, v in ipairs(self) do
+    ret[i] = f(v, i)
+  end
+  return ret
+end
+
+--- Create a table of `n` elements by running `f`
+--- @param n integer
+--- @param f function
+--- @return table
+function table.fill(n, f)
+  local ret = {}
+  for i = 1, n do
+    ret[i] = f()
   end
   return ret
 end

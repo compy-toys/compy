@@ -1,10 +1,10 @@
-local G = love.graphics
+local gfx = love.graphics
 math.randomseed(os.time())
-cw, ch = G.getDimensions()
+cw, ch = gfx.getDimensions()
 midx = cw / 2
 
 require("math")
-require("examples")
+examples = require("examples")
 
 size = 28
 spacing = 3
@@ -44,7 +44,6 @@ function advance()
   load_example(e)
   if ex_idx < #examples then
     ex_idx = ex_idx + 1
-    time = 0
   end
 end
 
@@ -53,7 +52,6 @@ function retreat()
     local e = examples[ex_idx]
     load_example(e)
     ex_idx = ex_idx - 1
-    time = 0
   end
 end
 
@@ -96,24 +94,25 @@ function setupTixy()
   local f = loadstring(code)
   if f then
     setfenv(f, _G)
+    time = 0
     tixy = f()
   end
 end
 
 function drawBackground()
-  G.setColor(colors.bg)
-  G.rectangle("fill", 0, 0, cw, ch)
+  gfx.setColor(colors.bg)
+  gfx.rectangle("fill", 0, 0, cw, ch)
 end
 
 function drawCircle(color, radius, x, y)
-  G.setColor(color)
-  G.circle(
+  gfx.setColor(color)
+  gfx.circle(
     "fill",
     x * (size + spacing) + offset,
     y * (size + spacing) + offset,
     radius
   )
-  G.circle(
+  gfx.circle(
     "line",
     x * (size + spacing) + offset,
     y * (size + spacing) + offset,
@@ -148,14 +147,14 @@ function drawOutput()
 end
 
 function drawText()
-  G.setColor(colors.text)
+  gfx.setColor(colors.text)
   local sof = (size / 2) + offset
   local hof = sof / 2
-  G.printf(legend, midx + hof, sof, midx - sof)
+  gfx.printf(legend, midx + hof, sof, midx - sof)
   if showHelp then
-    G.setColor(colors.help)
-    G.setFont(font)
-    G.printf(help, midx + hof, ch - (5 * sof), midx - sof)
+    gfx.setColor(colors.help)
+    gfx.setFont(font)
+    gfx.printf(help, midx + hof, ch - (5 * sof), midx - sof)
   end
 end
 

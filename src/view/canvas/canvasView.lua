@@ -4,7 +4,7 @@ require("view.canvas.terminalView")
 local class = require("util.class")
 require("util.view")
 
-local G = love.graphics
+local gfx = love.graphics
 
 --- @class CanvasView : ViewBase
 --- @field bg BGView
@@ -26,60 +26,60 @@ function CanvasView:draw(
   local cfg = self.cfg
   local test = cfg.drawtest
 
-  G.reset()
-  G.push('all')
-  G.setBlendMode('alpha', 'alphamultiply') -- default
+  gfx.reset()
+  gfx.push('all')
+  gfx.setBlendMode('alpha', 'alphamultiply') -- default
   if ViewUtils.conditional_draw('show_snapshot') then
     if snapshot then
-      G.draw(snapshot)
+      gfx.draw(snapshot)
     end
     self.bg:draw(drawable_height)
   end
 
   if not test then
     if ViewUtils.conditional_draw('show_terminal') then
-      -- G.setBlendMode('multiply', "premultiplied")
+      -- gfx.setBlendMode('multiply', "premultiplied")
       TerminalView.draw(terminal, term_canvas, snapshot)
     end
     if ViewUtils.conditional_draw('show_canvas') then
-      G.draw(canvas)
+      gfx.draw(canvas)
     end
-    G.setBlendMode('alpha', 'alphamultiply') -- default
+    gfx.setBlendMode('alpha', 'alphamultiply') -- default
   else
-    G.setBlendMode('alpha', 'alphamultiply') -- default
+    gfx.setBlendMode('alpha', 'alphamultiply') -- default
     for i = 0, love.test_grid_y - 1 do
       for j = 0, love.test_grid_x - 1 do
         local off_x = cfg.debugwidth * cfg.fw
         local off_y = cfg.debugheight * cfg.fh
         local dx = j * off_x
         local dy = i * off_y
-        G.reset()
-        G.translate(dx, dy)
+        gfx.reset()
+        gfx.translate(dx, dy)
 
         local index = (i * love.test_grid_x) + j + 1
 
         local b = ViewUtils.blendModes[index]
         if b then
-          -- G.setBlendMode('alpha') -- default
+          -- gfx.setBlendMode('alpha') -- default
           if ViewUtils.conditional_draw('show_terminal') then
             b.blend()
             TerminalView.draw(terminal, term_canvas, snapshot)
           end
-          G.setBlendMode('alpha') -- default
+          gfx.setBlendMode('alpha') -- default
           if ViewUtils.conditional_draw('show_canvas') then
-            G.draw(canvas)
+            gfx.draw(canvas)
           end
 
-          G.setBlendMode('alpha') -- default
-          G.setColor(1, 1, 1, 1)
-          G.setFont(cfg.labelfont)
+          gfx.setBlendMode('alpha') -- default
+          gfx.setColor(1, 1, 1, 1)
+          gfx.setFont(cfg.labelfont)
 
-          -- G.print(index .. ' ' .. b.name)
-          G.print(b.name)
+          -- gfx.print(index .. ' ' .. b.name)
+          gfx.print(b.name)
         end
       end
     end
   end
 
-  G.pop()
+  gfx.pop()
 end

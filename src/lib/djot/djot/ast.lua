@@ -5,10 +5,10 @@
 --- @field class? string
 --- @field id? string
 
---- @class AST
+--- @class djotAST
 --- @field t string tag for the node
 --- @field s? string text for the node
---- @field c AST[] child node
+--- @field c djotAST[] child node
 --- @field alias string
 --- @field level integer
 --- @field startidx integer
@@ -236,7 +236,7 @@ end, function(k) return displaykeys[k] or k end)
 
 --- Create a new AST node.
 --- @param tag (string) tag for the node
---- @return (AST) node (table)
+--- @return (djotAST) node (table)
 local function new_node(tag)
   local node = { t = tag, c = nil }
   setmetatable(node, mt)
@@ -244,8 +244,8 @@ local function new_node(tag)
 end
 
 --- Add `child` as a child of `node`.
---- @param node (AST) node parent node
---- @param child (AST) node child node
+--- @param node (djotAST) node parent node
+--- @param child (djotAST) node child node
 local function add_child(node, child)
   if (not node.c) then
     node.c = { child }
@@ -255,7 +255,7 @@ local function add_child(node, child)
 end
 
 --- Returns true if `node` has children.
---- @param node (AST) node to check
+--- @param node (djotAST) node to check
 --- @return (boolean) true if node has children
 local function has_children(node)
   return (node.c and #node.c > 0)
@@ -303,8 +303,8 @@ local function copy_attributes(target, source)
   end
 end
 
---- @param targetnode (AST)
---- @param cs (AST)
+--- @param targetnode (djotAST)
+--- @param cs (djotAST)
 local function insert_attributes_from_nodes(targetnode, cs)
   targetnode.attr = targetnode.attr or new_attributes()
   local i = 1
@@ -325,7 +325,7 @@ local function insert_attributes_from_nodes(targetnode, cs)
   end
 end
 
---- @param node (AST)
+--- @param node (djotAST)
 local function make_definition_list_item(node)
   node.t = "definition_list_item"
   if not has_children(node) then
@@ -416,7 +416,7 @@ local function to_ast(parser, sourcepos)
   local subject = parser.subject
   local warn = parser.warn
   if not warn then
-    warn = function() end
+    warn = function(o) end
   end
   local sourceposmap
   if sourcepos then
@@ -669,7 +669,7 @@ local function to_ast(parser, sourcepos)
         elseif node.t == "attributes" then
           -- parse attributes, add to last node
           local tip = containers[#containers]
-          --- @type AST|false
+          --- @type djotAST|false
           local prevnode = has_children(tip) and tip.c[#tip.c]
           if prevnode then
             local endswithspace = false
@@ -987,7 +987,7 @@ end
 
 --- Render an AST in human-readable form, with indentation
 --- showing the hierarchy.
---- @param doc (AST) djot AST
+--- @param doc (djotAST) djot AST
 --- @param handle (StringHandle) handle to which to write content
 local function render(doc, handle)
   render_node(doc, handle, 0)

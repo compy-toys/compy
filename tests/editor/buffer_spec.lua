@@ -107,7 +107,7 @@ print(sierpinski(4))]])
     describe('lua', function()
       local turtle = {
         '--- @diagnostic disable',
-        'width, height = G.getDimensions()',
+        'width, height = gfx.getDimensions()',
         'midx = width / 2',
         'midy = height / 2',
         'incr = 5',
@@ -119,15 +119,15 @@ print(sierpinski(4))]])
         'bg_color = Color.black',
         '',
         'local function drawHelp()',
-        '  G.setColor(Color[Color.white])',
-        '  G.print("Press [I] to open console", 20, 20)',
-        '  G.print("Enter \'forward\', \'back\', \'left\', or \'right\' to move the turtle!", 20, 40)',
+        '  gfx.setColor(Color[Color.white])',
+        '  gfx.print("Press [I] to open console", 20, 20)',
+        '  gfx.print("Enter \'forward\', \'back\', \'left\', or \'right\' to move the turtle!", 20, 40)',
         'end',
         '',
         'local function drawDebuginfo()',
-        '  G.setColor(Color[debugColor])',
+        '  gfx.setColor(Color[debugColor])',
         '  local label = string.format("Turtle position: (%d, %d)", tx, ty)',
-        '  G.print(label, width - 200, 20)',
+        '  gfx.print(label, width - 200, 20)',
         'end',
         '',
         'function love.draw()',
@@ -212,13 +212,13 @@ print(sierpinski(4))]])
         assert.same('', embuf:get_text_content()[1])
         embuf:move_selection('down', 2)
         assert.same(3, embuf:get_selection())
-        assert.same({ 'width, height = G.getDimensions()' }, embuf:get_selected_text())
+        assert.same({ 'width, height = gfx.getDimensions()' }, embuf:get_selected_text())
 
         local res = {
           '',
           '--- @diagnostic disable',
           '',
-          'width, height = G.getDimensions()',
+          'width, height = gfx.getDimensions()',
           'midx = width / 2',
         }
         assert.same(3, embuf:get_selection())
@@ -229,7 +229,7 @@ print(sierpinski(4))]])
         embuf:insert_newline()
         assert.same(res, table.take(embuf:get_text_content(), 5))
         embuf:move_selection('down')
-        assert.same({ 'width, height = G.getDimensions()' }, embuf:get_selected_text())
+        assert.same({ 'width, height = gfx.getDimensions()' }, embuf:get_selected_text())
         embuf:insert_newline()
         assert.same(res, table.take(embuf:get_text_content(), 5))
       end)

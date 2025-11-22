@@ -12,7 +12,7 @@ local function new(cfg, ctrl)
     cfg = cfg,
     controller = ctrl,
     input = UserInputView(cfg, ctrl.input),
-    buffer = BufferView(cfg),
+    buffers = {},
     search = SearchView(cfg, ctrl.search),
   }
   --- hook the view in the controller
@@ -23,7 +23,7 @@ end
 --- @class EditorView : ViewBase
 --- @field controller EditorController
 --- @field input UserInputView
---- @field buffer BufferView
+--- @field buffers { [string]: BufferView }
 --- @field search SearchView
 EditorView = class.create(new)
 
@@ -34,7 +34,8 @@ function EditorView:draw()
     self.search:draw(ctrl.search:get_input())
   else
     local spec = mode == 'reorder'
-    self.buffer:draw(spec)
+    local bv = self:get_current_buffer()
+    bv:draw(spec)
     if ViewUtils.conditional_draw('show_input') then
       local input = ctrl:get_input()
       self.input:draw(input)
@@ -42,7 +43,35 @@ function EditorView:draw()
   end
 end
 
+--- @param buffer BufferModel
+--- @return BufferView
+function EditorView:open(buffer)
+  local bid = buffer:get_id()
+  local opn = self.buffers[bid]
+  if not opn then
+    local v           = BufferView(self.cfg)
+    self.buffers[bid] = v
+    v:open(buffer)
+    return v
+  end
+  return opn
+end
+
+--- @return BufferView
+function EditorView:get_current_buffer()
+  local ctrl = self.controller
+  local bm = ctrl:get_active_buffer()
+  local bid = bm:get_id()
+  return self.buffers[bid]
+end
+
+--- @param bid string
+--- @return BufferView
+function EditorView:get_buffer(bid)
+  return self.buffers[bid]
+end
+
 --- @param moved integer?
 function EditorView:refresh(moved)
-  self.buffer:refresh(moved)
+  self:get_current_buffer():refresh(moved)
 end

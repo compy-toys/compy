@@ -172,7 +172,7 @@ function Dequeue:_checked(i, add, f)
   return ok, err
 end
 
---- Insert element at index
+--- Pop element at index
 --- @param i integer
 --- @return boolean
 --- @return string|any err_or_result

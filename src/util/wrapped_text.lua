@@ -37,7 +37,7 @@ require("util.lua")
 --- @field n_breaks integer
 ---
 --- @field wrap function
---- @field get_text function
+--- @field get_text fun(self): Dequeue<string>
 --- @field get_line function
 --- @field get_text_length function
 WrappedText = class.create()

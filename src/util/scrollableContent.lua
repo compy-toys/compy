@@ -2,7 +2,7 @@ require("util.wrapped_text")
 require("util.scrollable")
 require("util.range")
 
---- @class ScrollableContent
+--- @class ScrollableContent: WrappedText
 --- @field range Range?
 --- @field size integer
 --- @field size_max integer

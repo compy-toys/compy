@@ -1,6 +1,6 @@
-local G = love.graphics
+local gfx = love.graphics
 
-width, height = G.getDimensions()
+width, height = gfx.getDimensions()
 midx = width / 2
 midy = height / 2
 
@@ -22,7 +22,7 @@ setTime()
 math.randomseed(os.time())
 color = math.random(7)
 bg_color = math.random(7)
-font = G.newFont(144)
+font = gfx.newFont(144)
 
 local function pad(i)
   return string.format("%02d", i)
@@ -36,13 +36,13 @@ function getTimestamp()
 end
 
 function love.draw()
-  G.setColor(Color[color + Color.bright])
-  G.setBackgroundColor(Color[bg_color])
-  G.setFont(font)
+  gfx.setColor(Color[color + Color.bright])
+  gfx.setBackgroundColor(Color[bg_color])
+  gfx.setFont(font)
   local text = getTimestamp()
   local off_x = font:getWidth(text) / 2
   local off_y = font:getHeight() / 2
-  G.print(text, midx - off_x, midy - off_y)
+  gfx.print(text, midx - off_x, midy - off_y)
 end
 
 function love.update(dt)

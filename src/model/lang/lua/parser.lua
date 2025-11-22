@@ -5,7 +5,7 @@ require("util.debug")
 require("util.string.string")
 require("util.dequeue")
 
---- @class luaAST : token[]
+--- @class luaAST : token
 
 --- @alias CPos 'first'|'last'
 
@@ -288,6 +288,7 @@ return function(lib)
     local w = wrap or 80
     local ok, r = parse(code)
     if ok then
+      --- @diagnostic disable-next-line: param-type-mismatch
       local src = ast_to_src(r, {}, w)
       return string.lines(src)
     end
@@ -419,11 +420,24 @@ return function(lib)
     end
   end
 
+  --- @param code str
+  --- @param n integer?
+  --- @return string[]?
+  local function trunc(code, n)
+    local lines = n or 1
+    if lines == 1 then
+      local txt = string.lines(code)
+      local line1 = txt[1]:sub(1, -1) .. '…'
+      return { line1 }
+    end
+  end
+
   return {
     parse       = parse,
     pprint      = pprint,
     highlighter = highlighter,
     ast_to_src  = ast_to_src,
     chunker     = chunker,
+    trunc       = trunc,
   }
 end

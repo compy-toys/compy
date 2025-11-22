@@ -73,7 +73,7 @@ class VisibleContent {
 
 class VisibleStructuredContent {
   text: string[]
-  blocks: VisibleBlock[]
+  v_blocks: VisibleBlock[]
   reverse_map: ReverseMap
 
   range: Range?

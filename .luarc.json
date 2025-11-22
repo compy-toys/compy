@@ -17,6 +17,7 @@
     "write_to_input",
     "validated_input",
     "stop",
+    "pause",
     "continue",
     // luautils
     "prequire",

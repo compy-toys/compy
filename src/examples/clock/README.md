@@ -6,19 +6,19 @@ In this example, we explore how to properly create a program with it's own drawi
 
 We will be taking over the screen drawing for this simple game.
 Similar to `update()`, we can override the `love.draw()` function and have the LOVE2D framework handle displaying the content we wish.
-Drawing generally follows a simple procedure: set up some values, such as what foreground and background color to use, then build up our desired image using basic elements. These are called graphics "primitives", and we can access them from the `love.graphics` table (aliased here as `G`).
+Drawing generally follows a simple procedure: set up some values, such as what foreground and background color to use, then build up our desired image using basic elements. These are called graphics "primitives", and we can access them from the `love.graphics` table (aliased here as `gfx`).
 
 So, our example clock:
 ```lua
 function love.draw()
-  G.setColor(Color[color + Color.bright])
-  G.setBackgroundColor(Color[bg_color])
-  G.setFont(font)
+  gfx.setColor(Color[color + Color.bright])
+  gfx.setBackgroundColor(Color[bg_color])
+  gfx.setFont(font)
 
   local text = getTimestamp()
   local off_x = font:getWidth(text) / 2
   local off_y = font:getHeight() / 2
-  G.print(text, midx - off_x, midy - off_y)
+  gfx.print(text, midx - off_x, midy - off_y)
 end
 ```
 Let's see this step-by-step.
@@ -28,13 +28,13 @@ The way the `print` helper, and most graphics helpers work, is by starting drawi
 So, we need to determine the half-width and half-height of our text object to correctly draw it at the center. To do this, we can use the `getWidth()` and `getHeight()` helpers.
 We determined the midpoint of the screen earlier:
 ```lua
-width, height = G.getDimensions()
+width, height = gfx.getDimensions()
 midx = width / 2
 midy = height / 2
 ```
 Armed with this, we can draw the time dead center:
 ```lua
-G.print(text, midx - off_x, midy - off_y)
+gfx.print(text, midx - off_x, midy - off_y)
 ```
 
 #### Getting the timestamp
@@ -60,7 +60,7 @@ function setTime()
   t = s + M * m + H * h
 end
 ```
-Reading the current time is achieved by using `os.date()`, which unlike `os.time()`, allows us to specify the format of the resulting string. We want to achieve the end result of "hour:minute"second", which we could get with the format string "%H:%M:%S", but we also need these intermediate values separately, to keep time. Instead, if the special format string "*t" is passed to the function, it will return a table with the parts of the timestamp instead of a string.
+Reading the current time is achieved by using `os.date()`, which unlike `os.time()`, allows us to specify the format of the resulting stringfx. We want to achieve the end result of "hour:minute"second", which we could get with the format string "%H:%M:%S", but we also need these intermediate values separately, to keep time. Instead, if the special format string "*t" is passed to the function, it will return a table with the parts of the timestamp instead of a stringfx.
 
 #### Timekeeping
 
@@ -83,7 +83,7 @@ function getTimestamp()
   return string.format("%s:%s:%s", hours, minutes, seconds)
 end
 ```
-Quick aside on format strings: for a digital clock, we usually want to always have the numbers displayed as two digits, with colons in between them. To achieve this, we `pad` all our results, then stitch them together with `string.format()`.
+Quick aside on format strings: for a digital clock, we usually want to have the numbers displayed as two digits, with colons in between them. To achieve this, we `pad` all our results, then stitch them together with `string.format()`.
 In the above code, we are doing two different kinds of division.First, an integer division (`/`), going from seconds to minutes and hours, in this case we are only interested in the whole numbers, for example: 143 seconds is two full minutes and then some, but what the clock will be displaying is '02', so the remaining 23 seconds is not interesing for the minutes part.
 However, for 143 minutes, the display _should_ say 23, disregarding the two full hours, we are only interested in the remainder part. We can get this value by using `math.fmod()`, in this example, `math.fmod(143, 60)`.
 

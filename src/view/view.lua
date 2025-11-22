@@ -8,22 +8,22 @@ View = {
   --- @param C ConsoleController
   --- @param CV ConsoleView
   draw = function(C, CV)
-    G.push('all')
+    gfx.push('all')
     local terminal = C:get_terminal()
     local canvas = C:get_canvas()
     local input = C.input:get_input()
     CV:draw(terminal, canvas, input, canvas_snapshot)
-    G.pop()
+    gfx.pop()
   end,
 
   snap_canvas = function()
-    -- G.captureScreenshot(os.time() .. ".png")
+    -- gfx.captureScreenshot(os.time() .. ".png")
     if canvas_snapshot then
       View.clear_snapshot()
       collectgarbage()
     end
-    G.captureScreenshot(function(img)
-      canvas_snapshot = G.newImage(img)
+    gfx.captureScreenshot(function(img)
+      canvas_snapshot = gfx.newImage(img)
     end)
   end,
 

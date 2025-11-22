@@ -58,6 +58,11 @@ jobs:
           submodules: "recursive"
           fetch-depth: 0
           fetch-tags: true
+      - name: install just
+        uses: extractions/setup-just@v2
+      - name: Add versioninfo
+        run: |
+          just version
       - name: Build bare love package
         uses: love-actions/love-actions-core@v1
         with:
@@ -242,7 +247,7 @@ jobs:
           VER: ${{ github.ref_name }}
         run: echo VER_CODE="$(echo $VERSION | sed -e 's/^v//' -e 's/\.//g')" >> $GITHUB_ENV
       - name: Package for android
-        uses: compy-toys/love-actions-android@v0.2.5
+        uses: compy-toys/love-actions-android@v0.2.6
         with:
           love-ref: "compy"
           no-soft-keyboard: "enabled"

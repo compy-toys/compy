@@ -25,7 +25,7 @@ UserInputView = class.create(new)
 --- @param input InputDTO
 --- @param time number?
 function UserInputView:draw_input(input, time)
-  local G = love.graphics
+  local gfx = love.graphics
 
   local cfg = self.cfg
   local status = self.controller:get_status()
@@ -46,7 +46,7 @@ function UserInputView:draw_input(input, time)
   local drawableWidth = cfg.drawableWidth
   local w = cfg.drawableChars
   -- drawtest hack
-  if drawableWidth < G.getWidth() / 3 then
+  if drawableWidth < gfx.getWidth() / 3 then
     w = w * 2
   end
 
@@ -103,15 +103,15 @@ function UserInputView:draw_input(input, time)
     local ch = start_y + (vcl - 1) * fh
     local x_offset = math.fmod(acc, w)
 
-    G.push('all')
-    G.setColor(cf_colors.input.cursor)
-    G.print('|', (x_offset - .5) * fw, ch)
-    G.pop()
+    gfx.push('all')
+    gfx.setColor(cf_colors.input.cursor)
+    gfx.print('|', (x_offset - .5) * fw, ch)
+    gfx.pop()
   end
 
   local drawBackground = function()
-    G.setColor(colors.bg)
-    G.rectangle("fill",
+    gfx.setColor(colors.bg)
+    gfx.rectangle("fill",
       0,
       start_y,
       drawableWidth,
@@ -120,7 +120,7 @@ function UserInputView:draw_input(input, time)
 
   local highlight = input.highlight
   local visible = vc:get_visible()
-  G.setFont(self.cfg.font)
+  gfx.setFont(self.cfg.font)
   drawBackground()
   self.statusline:draw(status, apparentLines, time)
 
@@ -255,7 +255,7 @@ function UserInputView:draw_input(input, time)
     end
   else
     for l, str in ipairs(visible) do
-      G.setColor(colors.fg)
+      gfx.setColor(colors.fg)
       ViewUtils.write_line(l, str, start_y, 0, self.cfg)
     end
   end
@@ -279,8 +279,8 @@ function UserInputView:draw(input, time)
     local apparentHeight = #err_text
     local start_y = h - inHeight
     local drawBackground = function()
-      G.setColor(colors.input.error_bg)
-      G.rectangle("fill",
+      gfx.setColor(colors.input.error_bg)
+      gfx.rectangle("fill",
         0,
         start_y,
         drawableWidth,
@@ -288,7 +288,7 @@ function UserInputView:draw(input, time)
     end
 
     drawBackground()
-    G.setColor(colors.input.error)
+    gfx.setColor(colors.input.error)
     for l, str in ipairs(err_text) do
       local breaks = 0 -- starting height is already calculated
       ViewUtils.write_line(l, str, start_y, breaks, self.cfg)

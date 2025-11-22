@@ -16,14 +16,14 @@ ResultsView = class.create(new)
 function ResultsView:draw(results)
   local colors = self.cfg.colors.editor
   local fh = self.cfg.fh * 1.032 -- magic constant
-  local width, height = G.getDimensions()
+  local width, height = gfx.getDimensions()
   local has_results = (results.results and #(results.results) > 0)
 
   local draw_background = function()
-    G.push('all')
-    G.setColor(colors.results.bg)
-    G.rectangle("fill", 0, 0, width, height)
-    G.pop()
+    gfx.push('all')
+    gfx.setColor(colors.results.bg)
+    gfx.rectangle("fill", 0, 0, width, height)
+    gfx.pop()
   end
 
   local draw_results = function()
@@ -40,33 +40,33 @@ function ResultsView:draw(results)
         return ""
       end
     end
-    G.push('all')
-    G.setFont(self.cfg.font)
+    gfx.push('all')
+    gfx.setFont(self.cfg.font)
     if not has_results then
-      G.setColor(Color.with_alpha(colors.results.fg, 0.5))
-      G.print("No results", 25, 0)
+      gfx.setColor(Color.with_alpha(colors.results.fg, 0.5))
+      gfx.print("No results", 25, 0)
     else
       for i, v in ipairs(results.results) do
         local ln = i
         local lh = (ln - 1) * fh
         local t = v.r.type
         local label = getLabel(t)
-        G.setColor(Color.with_alpha(colors.results.fg, 0.5))
-        G.print(label, 2, lh + 2)
-        G.setColor(colors.results.fg)
-        G.print(v.r.name, 25, lh)
+        gfx.setColor(Color.with_alpha(colors.results.fg, 0.5))
+        gfx.print(label, 2, lh + 2)
+        gfx.setColor(colors.results.fg)
+        gfx.print(v.r.name, 25, lh)
       end
     end
-    G.pop()
+    gfx.pop()
   end
 
   local draw_selection = function()
     local highlight_line = function(ln)
       if not ln then return end
 
-      G.setColor(colors.highlight)
+      gfx.setColor(colors.highlight)
       local l_y = (ln - 1) * fh
-      G.rectangle('fill', 0, l_y, width, fh)
+      gfx.rectangle('fill', 0, l_y, width, fh)
     end
     local v = results.selection
     highlight_line(v)

@@ -6,13 +6,13 @@ local class = require('util.class')
 
 --- @class EditorModel
 --- @field input UserInputModel
---- @field buffer BufferModel?
+--- @field buffers Dequeue<BufferModel>
 --- @field search Search
 --- @field cfg Config
 EditorModel = class.create(function(cfg)
   return {
     input = UserInputModel(cfg, LuaEval()),
-    buffer = nil,
+    buffers = Dequeue.new({}, 'BufferModel'),
     search = Search(cfg),
     cfg = cfg,
   }

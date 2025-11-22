@@ -1,6 +1,6 @@
-local G = love.graphics
+gfx = love.graphics
 
-font = G.newFont()
+font = gfx.newFont()
 bg_color = Color.black
 body_color = Color.green
 limb_color = body_color + Color.bright
@@ -14,45 +14,45 @@ function drawBackground(color)
   if color_valid then
     c = color
   end
-  G.setColor(Color[c])
-  G.rectangle("fill", 0, 0, width, height)
+  gfx.setColor(Color[c])
+  gfx.rectangle("fill", 0, 0, width, height)
 end
 
 function drawFrontLegs(x_r, y_r, leg_xr, leg_yr)
-  G.setColor(Color[limb_color])
-  G.push("all")
-  G.translate(-x_r, -y_r / 2 - leg_xr)
-  G.rotate(-math.pi / 4)
-  G.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
-  G.pop()
-  G.push("all")
-  G.translate(x_r, -y_r / 2 - leg_xr)
-  G.rotate(math.pi / 4)
-  G.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
-  G.pop()
+  gfx.setColor(Color[limb_color])
+  gfx.push("all")
+  gfx.translate(-x_r, -y_r / 2 - leg_xr)
+  gfx.rotate(-math.pi / 4)
+  gfx.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
+  gfx.pop()
+  gfx.push("all")
+  gfx.translate(x_r, -y_r / 2 - leg_xr)
+  gfx.rotate(math.pi / 4)
+  gfx.ellipse("fill", 0, 0, leg_xr, leg_yr, 100)
+  gfx.pop()
 end
 
 function drawHindLegs(x_r, y_r, leg_r, leg_yr)
-  G.setColor(Color[limb_color])
-  G.push("all")
-  G.translate(-x_r, y_r / 2 + leg_r)
-  G.rotate(math.pi / 4)
-  G.ellipse("fill", 0, 0, leg_r, leg_yr, 100)
-  G.pop()
-  G.push("all")
-  G.translate(x_r, y_r / 2 + leg_r)
-  G.rotate(-math.pi / 4)
-  G.ellipse("fill", 0, 0, leg_r, leg_yr, 100)
-  G.pop()
+  gfx.setColor(Color[limb_color])
+  gfx.push("all")
+  gfx.translate(-x_r, y_r / 2 + leg_r)
+  gfx.rotate(math.pi / 4)
+  gfx.ellipse("fill", 0, 0, leg_r, leg_yr, 100)
+  gfx.pop()
+  gfx.push("all")
+  gfx.translate(x_r, y_r / 2 + leg_r)
+  gfx.rotate(-math.pi / 4)
+  gfx.ellipse("fill", 0, 0, leg_r, leg_yr, 100)
+  gfx.pop()
 end
 
 function drawBody(x_r, y_r, head_r)
   --- body
-  G.setColor(Color[body_color])
-  G.ellipse("fill", 0, 0, x_r, y_r, 100)
+  gfx.setColor(Color[body_color])
+  gfx.ellipse("fill", 0, 0, x_r, y_r, 100)
   --- head
   local neck = 5
-  G.circle("fill", 0, ((0 - y_r) - head_r) + neck, head_r, 100)
+  gfx.circle("fill", 0, ((0 - y_r) - head_r) + neck, head_r, 100)
   --- end
 end
 
@@ -62,24 +62,24 @@ function drawTurtle(x, y)
   local leg_yr = 10
   local x_r = 15
   local y_r = 20
-  G.push("all")
-  G.translate(x, y)
+  gfx.push("all")
+  gfx.translate(x, y)
   drawFrontLegs(x_r, y_r, leg_xr, leg_yr)
   drawHindLegs(x_r, y_r, leg_xr, leg_yr)
   drawBody(x_r, y_r, head_r)
-  G.pop()
+  gfx.pop()
 end
 
 function drawHelp()
-  G.setColor(Color[Color.white])
-  G.print("Press [I] to open console", 20, 20)
+  gfx.setColor(Color[Color.white])
+  gfx.print("Press [I] to open console", 20, 20)
   local help = "Enter 'forward', 'back', 'left', or 'right'" ..
       "to move the turtle!"
-  G.print(help, 20, 50)
+  gfx.print(help, 20, 50)
 end
 
 function drawDebuginfo()
-  G.setColor(Color[debug_color])
+  gfx.setColor(Color[debug_color])
   local dt = string.format("Turtle position: (%d, %d)", tx, ty)
-  G.print(dt, width - 200, 20)
+  gfx.print(dt, width - 200, 20)
 end
