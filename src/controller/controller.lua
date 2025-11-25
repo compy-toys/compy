@@ -537,7 +537,7 @@ Controller = {
     handlers.keypressed = function(k)
       --- Power shortcuts
       local function quickswitch()
-        if Key.ctrl() and k == 't' then
+        if Key.ctrl() and not Key.alt() and k == 't' then
           if love.state.app_state == 'running'
               or love.state.app_state == 'inspect'
               or love.state.app_state == 'project_open'

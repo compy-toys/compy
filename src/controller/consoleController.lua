@@ -824,7 +824,7 @@ function ConsoleController:keypressed(k)
         self.model.output:reset()
       end
       if love.DEBUG then
-        if k == 't' then
+        if Key.alt() and k == 't' then
           terminal_test()
           return
         end
