@@ -183,19 +183,28 @@ function ConsoleController:run_project(name)
     if f then
       local n = name or P.current.name or 'project'
       Log.info('Running \'' .. n .. '\'')
+      love.state.app_state = 'running'
       local rok, run_err = run_user_code(f, self, path)
-      if rok then
-        if self.main_ctrl.user_is_blocking() then
-          love.state.app_state = 'running'
-        end
-      else
+      if not rok then
+        love.state.app_state = 'project_open'
         print('Error: ', run_err)
+      else
+        if not self.main_ctrl.user_is_blocking() then
+          love.state.app_state = 'project_open'
+        end
       end
     else
       --- TODO extract error message here
       print(load_err)
     end
   end
+end
+
+local o_require = _G.require
+_G.o_require = o_require
+--- @param name string
+local function project_require(name)
+  return o_require(name)
 end
 
 _G.o_dofile = _G.dofile
@@ -233,6 +242,8 @@ function ConsoleController.prepare_env(cc)
       return f(...)
     end
   end
+
+  prepared.require          = project_require
 
   prepared.dofile           = function(name)
     return check_open_pr(function()
@@ -573,6 +584,18 @@ function ConsoleController:get_base_env()
   return self.base_env
 end
 
+---@return LuaEnv
+function ConsoleController:get_effective_env()
+  if
+      love.state.app_state == 'running'
+      or love.state.app_state == 'inspect'
+  then
+    return self:get_project_env()
+  else
+    return self:get_console_env()
+  end
+end
+
 ---@param t LuaEnv
 function ConsoleController:_set_project_env(t)
   self.project_env = t
@@ -626,11 +649,13 @@ function ConsoleController:open_project(name, play)
     self:close_project()
   end
 
-  local env = self:get_project_env()
   local open, create, err = P:opreate(name, play)
   local ok = open or create
   if ok then
-    local project_loader = P.current:get_loader(env)
+    local project_loader =
+        P.current:get_loader(function()
+          return self:get_effective_env()
+        end)
     self:cache_loader(name, project_loader)
 
     if not table.is_member(package.loaders, project_loader)
