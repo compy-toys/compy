@@ -47,6 +47,7 @@ local _C, _mode
 
 --- @param msg string
 local function user_error_handler(msg)
+  Log.debug('user error: ' .. msg)
   local err = LANG.get_call_error(msg) or ''
   local user_msg = messages.exec_error(err)
   _C:suspend_run(user_msg)
