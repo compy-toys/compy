@@ -495,7 +495,7 @@ local error = function(...)
   printer(s)
 end
 local debug = function(...)
-  if not love.DEBUG then return end
+  if love and not love.DEBUG then return end
   local args = { ... }
   local ts = string.format("%.3f ", os.clock())
   local s = annot(ts .. 'DEBUG ',
@@ -503,7 +503,7 @@ local debug = function(...)
   printer(s)
 end
 local once = function(...)
-  if not love.DEBUG then return end
+  if not love or not love.DEBUG then return end
   local args = { ... }
   local key = love.debug.once .. string.join(args, '')
   local kh = hash(key)
