@@ -134,6 +134,7 @@ end
 
 --- @param error string[]?
 function UserInputController:set_error(error)
+  Log.error(string.unlines(error or {}))
   self.model:set_error(error)
 end
 
