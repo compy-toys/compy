@@ -565,13 +565,13 @@ function ConsoleController:restart()
 end
 
 ---@return LuaEnv
-function ConsoleController:get_console_env()
-  return self.main_env
+function ConsoleController:get_pre_env_c()
+  return table.clone(self.pre_env)
 end
 
 ---@return LuaEnv
-function ConsoleController:get_pre_env_c()
-  return table.clone(self.pre_env)
+function ConsoleController:get_console_env()
+  return self.main_env
 end
 
 ---@return LuaEnv
