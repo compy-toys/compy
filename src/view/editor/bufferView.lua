@@ -84,7 +84,6 @@ function BufferView:open(buffer)
 
   local ir = self:_get_end_range()
   self:_update_visible(ir)
-  if off > 0 then self:scroll('down', 1) end
 end
 
 --- @private

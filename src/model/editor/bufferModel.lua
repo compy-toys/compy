@@ -20,7 +20,6 @@ local function render_blocks(blocks)
       ret:append_all(v.lines)
     end
   end
-  ret:append('')
   return ret
 end
 
@@ -51,7 +50,10 @@ local function new(
   local function plaintext()
     ct = 'plain'
     _content = Dequeue(lines, 'string')
-    sel = #_content + 1
+    if _content:last() ~= '' then
+      _content:push('')
+    end
+    sel = #_content
   end
   --- only passing this around so the linter shuts up about nil
   --- @param chk function
@@ -60,7 +62,7 @@ local function new(
     local ok, blocks = chk(lines)
     if ok then
       local len = #blocks
-      sel = len + 1
+      sel = len
     else
       readonly = true
       sel = 1
@@ -153,7 +155,7 @@ function BufferModel:rechunk()
 end
 
 function BufferModel:save()
-  self:highlight()
+  self:_text_change()
   local text = self:get_text_content()
   self:analyze()
   return self.save_file(text)
@@ -207,7 +209,7 @@ function BufferModel:move_selection(dir, by, warp, move)
   local l = self:get_content_length()
   local last = (function()
     if move then return l end
-    return l + 1
+    return l
   end)()
   if warp then
     if dir == 'up' then
@@ -303,9 +305,12 @@ function BufferModel:_text_change(rechunk)
       self:rechunk()
       self:rechunk()
     end
-  end
-  if self.content_type == 'md' then
+  else
     self:highlight()
+    local ll = self.content:last()
+    if ll ~= '' then
+      self.content:push('')
+    end
   end
 end
 
@@ -315,13 +320,8 @@ function BufferModel:delete_selected_text()
     local sb = self.content[sel]
     if not sb then return end
 
-    local l = sb.pos:len()
     self.content:remove(sel)
-    for i = sel, self:get_content_length() do
-      local b = self.content[i]
-      local r = b.pos
-      b.pos = r:translate(-l)
-    end
+    self:rechunk()
   else
     self.content:remove(sel)
   end
