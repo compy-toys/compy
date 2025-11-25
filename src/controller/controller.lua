@@ -563,18 +563,22 @@ Controller = {
           if k == "pause" then
             C:suspend_run(messages.user_break)
           end
-          if Key.shift() then
-            -- Ensure the user can get back to the console
-            if k == "q" then
-              C:quit_project()
-            end
-            if k == "s" then
-              if love.state.app_state == 'running' then
-                C:stop_project_run()
-              elseif love.state.app_state == 'editor' then
+          if k == "q" then
+            C:quit_project()
+          end
+          if k == "s" then
+            if love.state.app_state == 'running' then
+              C:stop_project_run()
+            elseif love.state.app_state == 'editor' then
+              if Key.shift() then
+                C:finish_edit()
+              else
                 C:close_buffer()
               end
             end
+          end
+          if Key.shift() then
+            --- Ensure the user can get back to the console
             if k == "r" then
               C:reset()
             end
