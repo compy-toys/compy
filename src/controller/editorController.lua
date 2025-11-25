@@ -665,7 +665,7 @@ function EditorController:_normal_mode_keys(k)
     end
 
     -- step into
-    if love.DEBUG and Key.ctrl() then
+    if Key.ctrl() then
       if k == "o" then
         self:follow_require()
       end
