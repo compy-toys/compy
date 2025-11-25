@@ -26,6 +26,14 @@ function History:remember(input)
     if not self.index then
       self:append(input)
       return true
+    else
+      local entry = self:get(self.index)
+      local new = input or {}
+      local hist = string.unlines(entry)
+      local new_s = string.unlines(new)
+      if hist ~= new_s then
+        self:append(input)
+      end
     end
   end
   return false
@@ -95,7 +103,6 @@ end
 function History:_get_entries()
   return self:items()
 end
-
 
 --- For debug purposes, log content
 --- @private
