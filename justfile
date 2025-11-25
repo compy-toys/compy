@@ -20,6 +20,8 @@ unit_test_tag TAG:
   @{{MON}} -e lua --exec 'echo -en "\n\n\n\n------------- BUSTED -------------\n" ; busted tests --tags {{TAG}}'
 unit_test_ast:
   @SHOW_AST=1 just unit_test_tag ast
+unit_test_src:
+  @SHOW_CODE=1 just unit_test_tag src
 unit_test_parser:
   @PARSER_DEBUG=1 just unit_test_tag parser
 unit_test_analyzer:
