@@ -22,11 +22,12 @@ describe('Buffer #editor', function()
     local cbuffer = BufferModel('untitled', tst, noop)
     local bc = cbuffer:get_content()
     assert.same(cbuffer.content_type, 'plain')
-    assert.same(4, #bc)
+    assert.same(5, #bc)
     assert.same(l1, bc[1])
     assert.same(l2, bc[2])
     assert.same(l3, bc[3])
     assert.same(l4, bc[4])
+    assert.same('', bc[5])
   end)
 
   it('renders lua', function()
@@ -38,7 +39,7 @@ describe('Buffer #editor', function()
     local cbuffer = BufferModel('untitled.lua', tst, noop, chunker, hl)
     local bc = cbuffer:get_content()
     assert.same(cbuffer.content_type, 'lua')
-    assert.same(4, #bc)
+    assert.same(5, #bc)
     assert.same({ l1 }, bc[1].lines)
     assert.same({ l2 }, bc[2].lines)
     assert.same({ l3 }, bc[3].lines)
@@ -76,7 +77,7 @@ print(sierpinski(4))]])
     end)
     it('sets content', function()
       assert.same('block', bufcon:type())
-      assert.same(4, #bufcon)
+      assert.same(5, #bufcon)
       assert.same({ '--- @param depth integer' }, bufcon[1].lines)
       assert.same(string.lines(meat), bufcon[2].lines)
       assert.is_true(table.is_instance(bufcon[3], 'empty'))
@@ -85,9 +86,11 @@ print(sierpinski(4))]])
   end)
 
   describe('modifications', function()
+    local trtl =
+    'Turtle graphics game inspired the LOGO family of languages.'
     local turtle_doc = {
       '',
-      'Turtle graphics game inspired the LOGO family of languages.',
+      trtl,
     }
     local turtle = {
       '--- @diagnostic disable',
@@ -164,19 +167,21 @@ print(sierpinski(4))]])
       lazy_setup(function()
         buffer = BufferModel('README', turtle_doc)
       end)
+      local qed = 'qed.'
+      local new = {
+        '',
+        trtl,
+        '',
+        qed,
+        ''
+      }
       it('insert newline', function()
         assert.same(#turtle_doc + 1, buffer:get_selection())
-        local qed = 'qed.'
         buffer:replace_selected_text({ qed })
         assert.same(#turtle_doc + 1, buffer:get_selection())
         assert.same(qed, buffer:get_selected_text())
         buffer:insert_newline()
-        local new = {
-          '',
-          'Turtle graphics game inspired the LOGO family of languages.',
-          '',
-          qed,
-        }
+
         assert.same(new, buffer:get_text_content())
       end)
     end)
@@ -188,14 +193,14 @@ print(sierpinski(4))]])
           noop, chunker, hl)
         bc = buffer:get_content()
       end)
-      local n_blocks = 24
+      local n_blocks = 25
       it('invariants', function()
         assert.same(n_blocks, #bc)
         assert.same(n_blocks, buffer:get_content_length())
 
         assert.same(turtle, buffer:get_text_content())
 
-        assert.same(n_blocks + 1, buffer:get_selection())
+        assert.same(n_blocks, buffer:get_selection())
         local ln = buffer:get_selection_start_line()
         assert.same(68, ln)
       end)
