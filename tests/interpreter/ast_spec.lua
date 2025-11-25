@@ -47,8 +47,7 @@ describe('parser #ast', function()
       io.write(term.reset)
     end
     if show_ast then
-      -- Log.info(parser.pprint(v, { hide_lineinfo = false }))
-      -- Log.debug(Debug.terse_hash(v, nil, nil, true))
+      Log.debug(Debug.terse_ast(ast, true))
     end
     return code, seen_comments
   end
