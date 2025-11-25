@@ -164,7 +164,7 @@ function ConsoleController:run_project(name)
   local P   = self.model.projects
   local cur = P.current
   local ok
-  if cur and cur == name then
+  if cur and (not name or cur.name == name) then
     ok = true
   else
     ok = self:open_project(name, false)
