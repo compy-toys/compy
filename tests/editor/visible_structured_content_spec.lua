@@ -41,19 +41,22 @@ end
 local hl = parser.highlighter
 
 describe('VisibleStructuredContent #visible', function()
+  local buffer, vsc
   local lines = string.lines(lua_ex)
-  local buffer = BufferModel('main.lua',
-    lines, TU.noop, chunker, hl)
-  local vsc = VisibleStructuredContent({
-      wrap_w = TU.w,
-      overscroll_max = TU.SCROLL_BY,
-      size_max = TU.LINES,
-      view_config = TU.mock_view_cfg
-    },
-    buffer:get_content(),
-    buffer.highlighter,
-    buffer.truncer
-  )
+  lazy_setup(function ()
+    buffer = BufferModel('main.lua',
+      lines, TU.noop, chunker, hl)
+    vsc = VisibleStructuredContent({
+        wrap_w = TU.w,
+        overscroll_max = TU.SCROLL_BY,
+        size_max = TU.LINES,
+        view_config = TU.mock_view_cfg
+      },
+      buffer:get_content(),
+      buffer.highlighter,
+      buffer.truncer
+    )
+  end)
 
   it('invariants', function()
     assert.same(TU.LINES, vsc.opts.size_max)
