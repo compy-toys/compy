@@ -401,14 +401,14 @@ Controller = {
       local uup = Controller._userhandlers.update
       if user_update and uup
       then
-        if love.state.app_state == 'snapshot' then
-          gfx.captureScreenshot(function(img)
-            local snap = gfx.newImage(img)
-            View.snapshot = snap
-            C:suspend()
-          end)
-        end
         wrap(uup, dt)
+      end
+      if love.state.app_state == 'snapshot' then
+        gfx.captureScreenshot(function(img)
+          local snap = gfx.newImage(img)
+          View.snapshot = snap
+          C:suspend()
+        end)
       end
 
       if love.harmony then
