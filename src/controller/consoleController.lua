@@ -207,11 +207,18 @@ local function project_require(cc, name)
   end
 end
 
+-- Set up audio table
+local compy_audio = require("util.audio")
+
 function ConsoleController.prepare_env(cc)
   local prepared            = cc.main_env
   prepared.G                = love.graphics
 
   local P                   = cc.model.projects
+
+  prepared.compy            = {
+    audio = compy_audio
+  }
 
   prepared.require          = function(name)
     return project_require(cc, name)
@@ -344,6 +351,10 @@ function ConsoleController.prepare_project_env(cc)
   ---@type table
   local project_env           = cc:get_pre_env_c()
   project_env.G               = love.graphics
+
+  project_env.compy           = {
+    audio = compy_audio
+  }
 
   project_env.require         = function(name)
     return project_require(cc, name)
