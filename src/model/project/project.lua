@@ -113,9 +113,9 @@ function Project:load_file(filename)
   end
 end
 
---- @param env LuaEnv
+--- @param get_env fun(): LuaEnv
 --- @return function
-function Project:get_loader(env)
+function Project:get_loader(get_env)
   --- @param modname string
   --- @return unknown|string
   return function(modname)
@@ -124,7 +124,7 @@ function Project:get_loader(env)
     Log.debug(string.format("%s loader, loading %s",
       self.name, modname))
     if f then
-      setfenv(f, env)
+      setfenv(f, get_env())
       return assert(f)
     else
       return string.format(
