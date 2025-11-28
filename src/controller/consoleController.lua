@@ -237,10 +237,6 @@ function ConsoleController.prepare_env(cc)
 
   local P                   = cc.model.projects
 
-  prepared.compy            = {
-    audio = compy_audio
-  }
-
   prepared.require          = function(name)
     return project_require(name)
   end
@@ -372,7 +368,8 @@ function ConsoleController.prepare_env(cc)
       clear = function()
         return terminal:clear()
       end
-    }
+    },
+    audio = compy_audio,
   }
   prepared.compy            = compy_namespace
   prepared.tty              = compy_namespace.terminal
