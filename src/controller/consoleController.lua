@@ -208,9 +208,7 @@ local function project_require(cc, name)
 end
 
 -- Set up audio table
-require "util.audio"
-local compy_audio = { }
-noises(compy_audio)
+local compy_audio = require("util.audio")
 
 function ConsoleController.prepare_env(cc)
   local prepared            = cc.main_env
