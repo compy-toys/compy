@@ -332,9 +332,27 @@ function EditorController:_handle_submit(go)
       local block = buf:get_content():get(sel)
       if not block then return end
     else
+      local _, raw_chunks = buf.chunker(raw, true)
+      local pretty = buf.printer(raw)
+      if pretty then
+        inter:set_text(pretty)
+      else
+        --- fallback to original in case of unparse-able input
+        pretty = raw
+      end
       local ok, res = inter:evaluate()
-      local _, chunks = buf.chunker(raw, true)
+      local _, chunks = buf.chunker(pretty, true)
       if ok then
+        if #chunks < #raw_chunks then
+          local rc = raw_chunks
+          if rc[1].tag == 'empty' then
+            table.insert(chunks, 1, Empty(0))
+          end
+          if rc[#rc].tag == 'empty' then
+            local li = chunks[#chunks].pos.fin
+            table.insert(chunks, Empty(li + 1))
+          end
+        end
         go(chunks)
       else
         local eval_err = res
