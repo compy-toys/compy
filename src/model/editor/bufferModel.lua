@@ -405,13 +405,15 @@ function BufferModel:replace_selected_text(t)
 end
 
 --- Insert a new line or empty block _before_ the selection
+--- Returns true if a block/line was inserted
 --- @param i integer?
+--- @return boolean?
 function BufferModel:insert_newline(i)
   --- block or line number
   local bln = i or self:get_selection()
   if self.content_type == 'lua' then
     local sb = self.content[bln]
-    if not sb then return end
+    if not sb then return  end
     local prev_b = self.content[bln - 1]
     -- disallow consecutive empties
     local prev_empty = prev_b and prev_b:is_empty()
@@ -422,9 +424,11 @@ function BufferModel:insert_newline(i)
     local ln = self:get_selection_start_line()
     self.content:insert(Empty(ln), bln)
     self:_text_change(true)
+    return true
   else
     self.content:insert('', bln)
     self:_text_change()
+    return true
   end
 end
 

@@ -499,11 +499,31 @@ function EditorController:_normal_mode_keys(k)
   local buf            = self:get_active_buffer()
 
   local function newline()
-    if not Key.ctrl() and Key.shift() and Key.is_enter(k) then
-      buf:insert_newline()
-      self:save(buf)
-      self.view:refresh()
-      block_input()
+    if Key.is_enter(k) then
+      --- insert empty block if input is empty
+      if is_empty
+          and not Key.ctrl()
+          and Key.shift()
+          and not Key.alt() then
+        buf:insert_newline()
+        self:save(buf)
+        self.view:refresh()
+        block_input()
+      end
+      --- insert empty block regardless
+      if Key.ctrl()
+          and not Key.shift()
+          and not Key.alt() then
+        local r = buf:insert_newline()
+        self:save(buf)
+        if r then
+          local l = buf.loaded
+          self:_move_sel('down', 1)
+          if l then buf:set_loaded() end
+        end
+        self.view:refresh()
+        block_input()
+      end
     end
   end
 
@@ -556,9 +576,9 @@ function EditorController:_normal_mode_keys(k)
   end
 
   if is_empty then
-    newline()
     copycut()
   end
+  newline()
 
   paste_k()
 
