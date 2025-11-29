@@ -78,8 +78,9 @@ function Statusline:draw(status, start_y)
           midX - (8 * cf.fw),
           start_text.y + corr)
       end
-      local lw = font:getWidth(state) / 2
-      gfx.print((state or '???'),
+      local sl = state or '???'
+      local lw = font:getWidth(sl) / 2
+      gfx.print((sl),
         midX - lw, start_text.y)
       gfx.setColor(colors.fg)
     end

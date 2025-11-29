@@ -709,7 +709,30 @@ function ConsoleController:close_project()
   return true
 end
 
+--- @return Project?
+function ConsoleController:get_current_project()
+  local P = self.model.projects
+  return P.current
+end
+
+function ConsoleController:evacuate_required()
+  local open = self:get_current_project()
+  if not open then return end
+  local files = open:contents()
+  local lua = '.lua$'
+  for _, v in ipairs(files) do
+    if string.matches(v.name, lua, true) then
+      local fn = v.name
+      local modname = fn:gsub(lua, '')
+      if package.loaded[modname] then
+        package.loaded[modname] = nil
+      end
+    end
+  end
+end
+
 function ConsoleController:stop_project_run()
+  self:evacuate_required()
   self.main_ctrl.set_default_handlers(self, self.view)
   self.main_ctrl.set_love_update(self)
   love.state.user_input = nil
@@ -732,13 +755,13 @@ end
 function ConsoleController:edit(name, state)
   if love.state.app_state == 'running' then return end
 
-  local PS = self.model.projects
-  local p  = PS.current
+  local PS    = self.model.projects
+  local p     = PS.current
   local filename
   -- if state and state.buffer then
   --   filename = state.buffer.filename
   -- else
-    filename = name or ProjectService.MAIN
+  filename    = name or ProjectService.MAIN
   -- end
   local fpath = p:get_path(filename)
   local ex    = FS.exists(fpath)

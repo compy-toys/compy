@@ -133,8 +133,10 @@ function SearchController:keypressed(k)
     if Key.shift() or Key.ctrl() then return end
     local sel = self.model.selection
     local r = self.model.resultset[sel].r
+    self.input:update_view()
     return r
   end
+  self.input:update_view()
 end
 
 --- @param t string

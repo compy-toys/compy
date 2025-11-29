@@ -821,6 +821,7 @@ function UserInputModel:handle(eval)
         end
       else
         local perr = result[1]
+        -- Log.debug(Debug.terse_t(perr, nil, nil, true))
         if perr then
           if perr.c then
             local c = perr.c
