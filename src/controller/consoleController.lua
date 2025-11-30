@@ -203,7 +203,11 @@ end
 local o_require = _G.require
 _G.o_require = o_require
 --- @param name string
-local function project_require(name)
+--- @param run 'run'?
+local function project_require(name, run)
+  if run then
+    Log.info('req', name)
+  end
   return o_require(name)
 end
 
@@ -228,11 +232,18 @@ local function project_dofile(cc, filename, env)
   end
 end
 
+-- Set up audio table
+local compy_audio = require("util.audio")
+
 function ConsoleController.prepare_env(cc)
   local prepared            = cc.main_env
   prepared.gfx              = love.graphics
 
   local P                   = cc.model.projects
+
+  prepared.require          = function(name)
+    return project_require(name)
+  end
 
   --- @param f function
   local check_open_pr       = function(f, ...)
@@ -361,7 +372,8 @@ function ConsoleController.prepare_env(cc)
       clear = function()
         return terminal:clear()
       end
-    }
+    },
+    audio = compy_audio,
   }
   prepared.compy            = compy_namespace
   prepared.tty              = compy_namespace.terminal
@@ -392,9 +404,19 @@ function ConsoleController.prepare_project_env(cc)
   local project_env           = cc:get_pre_env_c()
   project_env.gfx             = love.graphics
 
+  project_env.compy           = {
+    audio = compy_audio
+  }
+
+  project_env.require         = function(name)
+    return project_require(name)
+  end
   project_env.dofile          = function(name)
     return project_dofile(cc, name, cc:get_project_env())
   end
+  -- project_env.require         = function(name)
+  --   return project_require(name, 'run')
+  -- end
 
   --- @param msg string?
   project_env.pause           = function(msg)

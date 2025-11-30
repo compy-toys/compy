@@ -309,6 +309,7 @@ function BufferModel:_text_change(rechunk)
     self:highlight()
     local ll = self.content:last()
     if ll ~= '' then
+      -- Log.warn('asd')
       self.content:push('')
     end
   end

@@ -78,11 +78,11 @@ function love.conf(t)
   t.identity = 'compy'
   t.window.resizable = false
 
+  local width = 1024
+  local height = 600
   if start.mode ~= 'play' then
     local hidpi = os.getenv("HIDPI")
 
-    local width = 1024
-    local height = 600
     if hidpi == 'true' or hidpi == 'TRUE' then
       t.window.width = width * 2
       t.window.height = height * 2
@@ -103,6 +103,9 @@ function love.conf(t)
     if string.len(gp) > 0 then
       title = string.format('%s - %s', 'Compy Player', gp)
     end
+    t.window.resizable = true
+    love.fixHeight = height
+    love.fixWidth = width
     t.window.title = title
   end
   love.test_grid_x = 4
