@@ -27,6 +27,7 @@ for _,name in pairs(names) do
   local filename = "assets/sounds/"..name..".ogg"
   local source = love.audio.newSource(filename, "static")
   audio[name] = function()
+    love.audio.stop(source)
     love.audio.play(source)
   end
 end
