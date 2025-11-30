@@ -203,7 +203,11 @@ end
 local o_require = _G.require
 _G.o_require = o_require
 --- @param name string
-local function project_require(name)
+--- @param run 'run'?
+local function project_require(name, run)
+  if run then
+    Log.info('req', name)
+  end
   return o_require(name)
 end
 
@@ -410,6 +414,9 @@ function ConsoleController.prepare_project_env(cc)
   project_env.dofile          = function(name)
     return project_dofile(cc, name, cc:get_project_env())
   end
+  -- project_env.require         = function(name)
+  --   return project_require(name, 'run')
+  -- end
 
   --- @param msg string?
   project_env.pause           = function(msg)
