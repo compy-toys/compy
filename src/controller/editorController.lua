@@ -528,7 +528,9 @@ function EditorController:_normal_mode_keys(k)
   end
 
   local function delete_block()
+    local t = string.unlines(buf:get_selected_text())
     buf:delete_selected_text()
+    love.system.setClipboardText(t)
     self:save(buf)
     self.view:refresh()
   end
