@@ -134,7 +134,6 @@ end
 
 --- @param error string[]|Error[]?
 function UserInputController:set_error(error)
-  Log.error(string.unlines(error or {}))
   self.model:set_error(error)
 end
 
@@ -148,9 +147,6 @@ end
 function UserInputController:evaluate()
   local ok, res = self.model:handle(true)
   self:update_view()
-  if type(res[0]) == 'table' then
-    Log.debug('uic eval', res[0].msg)
-  end
   return ok, res
 end
 
