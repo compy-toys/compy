@@ -85,7 +85,7 @@ function EditorController:open(name, content, save)
 end
 
 --- @private
-function EditorController:_dump_bufferlist()
+function EditorController:_print_bufferlist()
   for i, v in ipairs(self.model.buffers) do
     Log.debug(i, v.name)
   end

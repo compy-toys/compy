@@ -147,10 +147,10 @@ function UserInputView:render_input(input, status)
     local hl = highlight.hl
     local perr = highlight.parse_err
     local el, ec
-        if perr then
-            el = perr.l
-            ec = perr.c
-        end
+    if perr then
+      el = perr.l
+      ec = perr.c
+    end
     for l, s in ipairs(visible) do
       local ln = l + vc.offset
       local tl = string.ulen(s)
