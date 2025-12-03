@@ -320,7 +320,7 @@ Debug = {
     if type(t) == 'table' then
       local start = math.max(1, skip or 0)
       for i = start, #t do
-        local l = t[i]
+        local l = t[i] or ''
         local line = (function()
           if not no_ln then
             return string.format("#%02d: %s\n", i, text(l))
