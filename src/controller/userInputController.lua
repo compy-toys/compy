@@ -132,7 +132,7 @@ function UserInputController:clear_error()
   self.model:clear_error()
 end
 
---- @param error string[]?
+--- @param error string[]|Error[]?
 function UserInputController:set_error(error)
   Log.error(string.unlines(error or {}))
   self.model:set_error(error)
