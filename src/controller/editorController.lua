@@ -123,10 +123,8 @@ function EditorController:close_buffer()
   local bs = self.model.buffers
   local n_buffers = bs:length()
   if n_buffers < 2 then
-    -- Log.debug('fin', n_buffers)
     self.console:finish_edit()
   else
-    -- Log.debug(':bd', n_buffers)
     self:pop_buffer()
   end
 end
@@ -591,29 +589,52 @@ function EditorController:_normal_mode_keys(k)
 
   --- handlers
   local function submit()
-    if not Key.ctrl() and not Key.shift() and Key.is_enter(k) then
-      local bufv = self.view:get_current_buffer()
-      local function go(newtext)
+    local bufv = self.view:get_current_buffer()
+    local function replace(newtext)
+      if bufv:is_selection_visible() then
+        if buf:loaded_is_sel(true) then
+          local _, n = buf:replace_content(newtext)
+          buf:clear_loaded()
+          self:save(buf)
+          input:clear()
+          self.view:refresh()
+          self:_move_sel('down', n)
+          load_selection()
+          self:update_status()
+        else
+          buf:select_loaded()
+          bufv:follow_selection()
+        end
+      else
+        bufv:follow_selection()
+      end
+    end
+
+    if Key.ctrl()
+        and not Key.shift()
+        and not Key.alt()
+        and Key.is_enter(k) then
+      local function add(newtext)
         if bufv:is_selection_visible() then
-          if buf:loaded_is_sel(true) then
-            local _, n = buf:replace_selected_text(newtext)
-            buf:clear_loaded()
-            self:save(buf)
-            input:clear()
-            self.view:refresh()
-            self:_move_sel('down', n)
-            load_selection()
-            self:update_status()
-          else
-            buf:select_loaded()
-            bufv:follow_selection()
-          end
+          local sel = buf:get_selection()
+          local _, n = buf:insert_content(newtext, sel)
+          self:save(buf)
+          self.view:refresh()
+          self:_move_sel('down', n)
+          self:update_status()
         else
           bufv:follow_selection()
         end
       end
 
-      self:_handle_submit(go)
+      self:_handle_submit(add)
+    end
+
+    if not Key.ctrl()
+        and not Key.shift()
+        and not Key.alt()
+        and Key.is_enter(k) then
+      self:_handle_submit(replace)
     end
   end
   local function load()

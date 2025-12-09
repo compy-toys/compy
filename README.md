@@ -59,8 +59,8 @@ a project must be selected first.
 | Move selection                                                    | <kbd>Ctrl</kbd>+<kbd>⇧</kbd>/<kbd>⇩</kbd>     |
 | Replace selection with input                                      | <kbd>Enter ⏎</kbd>                            |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _additionally_               |                                               |
+| Insert input contents before selection                            | <kbd>Ctrl</kbd>+<kbd>Enter ⏎</kbd>            |
 | Insert empty block before current (if input is empty)             | <kbd>Shift</kbd>+<kbd>Enter ⏎</kbd>           |
-| Insert empty block before current (always)                        | <kbd>Ctrl</kbd>+<kbd>Enter ⏎</kbd>            |
 | Delete selected block                                             | <kbd>Ctrl</kbd>+<kbd>Delete</kbd>             |
 | Delete selected block (if input is empty)                         | <kbd>Ctrl</kbd>+<kbd>Y</kbd>                  |
 | Wipe input                                                        | <kbd>Ctrl</kbd>+<kbd>W</kbd>                  |
