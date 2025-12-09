@@ -8,7 +8,8 @@ describe('Buffer #editor', function()
   local chunker = function(t, single)
     return parser.chunker(t, w, single)
   end
-  -- local chunker = parser.chunker
+
+  local printer = parser.pprint
   local hl = parser.highlighter
 
   local noop = function() end
@@ -177,12 +178,46 @@ print(sierpinski(4))]])
       }
       it('insert newline', function()
         assert.same(#turtle_doc + 1, buffer:get_selection())
-        buffer:replace_selected_text({ qed })
+        buffer:replace_content({ qed })
         assert.same(#turtle_doc + 1, buffer:get_selection())
         assert.same(qed, buffer:get_selected_text())
         buffer:insert_newline()
 
         assert.same(new, buffer:get_text_content())
+      end)
+
+      describe('insert', function()
+        local addbuf
+        lazy_setup(function()
+          addbuf = BufferModel('README', turtle_doc)
+        end)
+        it('one', function()
+          local newlines = { 'test' }
+          addbuf:insert_content(newlines, 2)
+          local exp = {
+            '',
+            'test',
+            'Turtle graphics game inspired the LOGO family of languages.',
+            '',
+          }
+          local res = addbuf:get_text_content()
+          assert.same(exp, res)
+        end)
+
+        it('multiple', function()
+          local newlines = { 'line1', 'line2', }
+          addbuf:insert_content(newlines, 1)
+          local exp = {
+            'line1',
+            'line2',
+            '',
+            'test',
+            'Turtle graphics game inspired the LOGO family of languages.',
+            '',
+          }
+          local res = addbuf:get_text_content()
+          assert.same(exp, res)
+        end)
       end)
     end)
 
@@ -258,7 +293,7 @@ print(sierpinski(4))]])
         assert.same({ turtle[ln] }, replbuf:get_selected_text())
 
         local empty = Empty(ln)
-        local ins, n = replbuf:replace_selected_text({ empty })
+        local ins, n = replbuf:replace_content({ empty })
         assert.truthy(ins)
         assert.same(1, n)
       end)
@@ -279,7 +314,7 @@ print(sierpinski(4))]])
           replbuf:get_selected_text())
 
         local empty = Empty(ln)
-        local ins, n = replbuf:replace_selected_text({ empty })
+        local ins, n = replbuf:replace_content({ empty })
         assert.truthy(ins)
         assert.same(1, n)
       end)
@@ -310,7 +345,7 @@ print(sierpinski(4))]])
           replbuf:get_selected_text())
 
         local empty = Empty(ln)
-        local ins, n = replbuf:replace_selected_text({ empty })
+        local ins, n = replbuf:replace_content({ empty })
         assert.truthy(ins)
         assert.same(1, n)
 
@@ -337,7 +372,7 @@ print(sierpinski(4))]])
 
         local ok, chunks = chunker(new, true)
         assert.is_true(ok)
-        local _, n = replbuf:replace_selected_text(chunks)
+        local _, n = replbuf:replace_content(chunks)
         assert.same(1, n)
       end)
       it('breaking line in block', function()
@@ -358,20 +393,24 @@ print(sierpinski(4))]])
 
         local ok, chunks = chunker(new, true)
         assert.is_true(ok)
-        local _, n = replbuf:replace_selected_text(chunks)
+        local _, n = replbuf:replace_content(chunks)
         assert.same(1, n)
 
         assert.same(24, replbuf:get_selection())
       end)
 
-      describe('lua', function()
-        local addbuf = table.clone(buffer)
-        local orig_b = { 'function love.update(dt)',
-          '  t = t + dt',
-          '  if ty > midy then',
-          '    debugColor = Color.red',
-          '  end',
-          'end' }
+      describe('lua newline', function()
+        local addbuf
+        local orig_b
+        lazy_setup(function()
+          addbuf = table.clone(buffer)
+          orig_b = { 'function love.update(dt)',
+            '  t = t + dt',
+            '  if ty > midy then',
+            '    debugColor = Color.red',
+            '  end',
+            'end' }
+        end)
 
         it('introducing a new line', function()
           addbuf:move_selection('down', nil, true)
@@ -384,7 +423,7 @@ print(sierpinski(4))]])
 
           local ok, chunks = chunker(new, true)
           assert.is_true(ok)
-          local _, n = addbuf:replace_selected_text(chunks)
+          local _, n = addbuf:replace_content(chunks)
           assert.same(2, n)
 
           assert.same(23, addbuf:get_selection())
@@ -398,14 +437,60 @@ print(sierpinski(4))]])
           local ok, chunks = chunker(new, true)
           assert.is_true(ok)
 
-          local _, n = addbuf:replace_selected_text(chunks)
+          local _, n = addbuf:replace_content(chunks)
           assert.same(1, n)
 
           assert.same(25, addbuf:get_selection())
         end)
       end)
 
+      describe('lua insert', function()
+        local addbuf
+        lazy_setup(function()
+          addbuf = table.clone(buffer)
+        end)
+        it('insert two lines', function()
+          local lines = { 'x = 1; y =2' }
+          local pretty = printer(lines)
+          local _, newblocks = chunker(pretty, true)
 
+          addbuf:insert_content(newblocks, 4)
+          local exp = {
+            '--- @diagnostic disable',
+            'width, height = gfx.getDimensions()',
+            'midx = width / 2',
+            'x = 1',
+            'y = 2',
+            'midy = height / 2',
+            'incr = 5',
+          }
+          local res = table.slice(
+            addbuf:get_text_content(), 1, 7
+          )
+          assert.same(exp, res)
+        end)
+        it('insert after empty lines', function()
+          local lines = { 'string = "empty"' }
+          local pretty = printer(lines)
+          local _, newblocks = chunker(pretty, true)
+
+          addbuf:insert_content(newblocks, 9)
+          local exp = {
+            'midx = width / 2',
+            'x = 1',
+            'y = 2',
+            'midy = height / 2',
+            'incr = 5',
+            '',
+            'string = "empty"',
+            'tx, ty = midx, midy'
+          }
+          local res = table.slice(
+            addbuf:get_text_content(), 3, 10
+          )
+          assert.same(exp, res)
+        end)
+      end)
       --- end ---
     end)
   end)

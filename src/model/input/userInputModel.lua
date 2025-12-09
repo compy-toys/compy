@@ -820,9 +820,11 @@ function UserInputModel:handle(eval)
           end
         end
       else
+        --- @TODO fix
         local perr = result[1]
         -- Log.debug(Debug.terse_t(perr, nil, nil, true))
         if perr then
+          --- @TODO check line len and move to next if at end
           if perr.c then
             local c = perr.c
             if c > 1 then c = c + 1 end
@@ -849,20 +851,29 @@ end
 --- @return string[]?
 function UserInputModel:get_wrapped_error()
   if self.error then
+    local e = table.map(self.error, function(er)
+      return tostring(er)
+    end)
     local we = string.wrap_array(
-      self.error,
+      e,
       self.visible.wrap_w)
-    table.insert(we, 1, 'Errors:')
+      table.insert(we, 1, 'Errors:')
     return we
   end
 end
 
+--- @TODO support error[] and string[]
 --- @param errors Error[]?
 function UserInputModel:set_error(errors)
-  self.error = {}
+  self.error = nil
   if type(errors) == "table" then
-    for _, e in ipairs(errors) do
-      table.insert(self.error, tostring(e))
+    if type(errors[1] == "string") then
+      self.error = errors
+    else
+      self.error = {}
+      for _, e in ipairs(errors) do
+        table.insert(self.error, tostring(e))
+      end
     end
   end
 end

@@ -85,7 +85,7 @@ function EditorController:open(name, content, save)
 end
 
 --- @private
-function EditorController:_dump_bufferlist()
+function EditorController:_print_bufferlist()
   for i, v in ipairs(self.model.buffers) do
     Log.debug(i, v.name)
   end
@@ -507,20 +507,6 @@ function EditorController:_normal_mode_keys(k)
           and not Key.alt() then
         buf:insert_newline()
         self:save(buf)
-        self.view:refresh()
-        block_input()
-      end
-      --- insert empty block regardless
-      if Key.ctrl()
-          and not Key.shift()
-          and not Key.alt() then
-        local r = buf:insert_newline()
-        self:save(buf)
-        if r then
-          local l = buf.loaded
-          self:_move_sel('down', 1)
-          if l then buf:set_loaded() end
-        end
         self.view:refresh()
         block_input()
       end

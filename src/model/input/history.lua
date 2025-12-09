@@ -107,7 +107,7 @@ end
 --- For debug purposes, log content
 --- @private
 --- @param f function
-function History:_dump(f)
+function History:_dbgprint(f)
   local log = f or Log.debug
   local h = self:items()
   local t = table.map(h, function(t)
