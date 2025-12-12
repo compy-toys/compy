@@ -13,16 +13,15 @@ describe('parser.chunker #chunk', function()
   end
 
   describe('produces blocks', function()
-    for i, test in ipairs(inputs) do
-      local str = test[1]
-      local blk = test[2]
+      for i, test in ipairs(inputs) do
+        local str = test[1]
+        local blk = test[2]
 
-      local ok, output = chunker(str)
-      it('matches ' .. i, function()
-        assert.is_true(ok)
-        assert.same(blk, output)
-      end)
-    end
+        it('matches ' .. i, function()
+          local ok, output = chunker(str)
+          assert.is_true(ok)
+          assert.same(blk, output)
+        end)
+      end
   end)
-
 end)

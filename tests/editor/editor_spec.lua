@@ -432,22 +432,20 @@ describe('Editor #editor', function()
   --- end plaintext
 
   describe('structured (lua) works', function()
-    local controller, press = wire(TU.mock_view_cfg())
-    local save, savefile = TU.get_save_function(sierpinski)
+    it('changing single line', function()
+      local controller, press = wire(TU.mock_view_cfg())
+      local save, savefile = TU.get_save_function(sierpinski)
 
-    controller:open('sierpinski.lua', sierpinski, save)
+      controller:open('sierpinski.lua', sierpinski, save)
 
-    local input = controller.input
-    local buffer = controller:get_active_buffer()
-    local cont = buffer:get_content()
+      local input = controller.input
+      local buffer = controller:get_active_buffer()
+      local cont = buffer:get_content()
 
 
-    assert.same('lua', buffer.content_type)
-    it('length is correct', function()
+      assert.same('lua', buffer.content_type)
       assert.same('block', cont:type())
       assert.same(4, buffer:get_content_length())
-    end)
-    it('changing single line', function()
       local modified = table.clone(sierpinski)
       local new_print = 'print(sierpinski(3))'
       mock.keystroke('up', press)
