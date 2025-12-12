@@ -490,6 +490,34 @@ print(sierpinski(4))]])
           )
           assert.same(exp, res)
         end)
+
+        it('insert three lines', function()
+          local lines = {
+            'a1 = 1',
+            ' a2 = 2',
+            'z="a"',
+          }
+          local pretty = printer(lines)
+          local _, newblocks = chunker(pretty, true)
+
+          addbuf:insert_content(newblocks, 4)
+          local exp = {
+            '--- @diagnostic disable',
+            'width, height = gfx.getDimensions()',
+            'midx = width / 2',
+            'a1 = 1',
+            'a2 = 2',
+            'z = "a"',
+            'x = 1',
+            'y = 2',
+            'midy = height / 2',
+            'incr = 5',
+          }
+          local res = table.slice(
+            addbuf:get_text_content(), 1, 10
+          )
+          assert.same(exp, res)
+        end)
       end)
       --- end ---
     end)

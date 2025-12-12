@@ -453,7 +453,6 @@ function BufferModel:insert_content(t, lbn)
     if n == 0 then
       return false
     end
-    local rechunk = false
     --- content start and original length
     local cs, ol = (function()
       local current = self.content[num]
@@ -475,7 +474,6 @@ function BufferModel:insert_content(t, lbn)
       c.pos = nr
       self.content:insert(c, num)
     end
-    rechunk = true
 
     --- move subsequent chunks down
     local diff = chunks[n].pos:len() - ol
@@ -486,7 +484,7 @@ function BufferModel:insert_content(t, lbn)
       end
     end
 
-    self:_text_change(rechunk)
+    self:_text_change(true)
     return true, n
   else
     local ti = num
