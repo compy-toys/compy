@@ -208,7 +208,11 @@ local function project_require(name, run)
   if run then
     Log.info('req', name)
   end
-  return o_require(name)
+  if _G.web and name == 'bit' then
+    return o_require('util.luabit')
+  else
+    return o_require(name)
+  end
 end
 
 _G.o_dofile = _G.dofile
