@@ -500,8 +500,7 @@ function EditorController:_normal_mode_keys(k)
     if Key.is_enter(k) then
       --- insert empty block if input is empty
       if is_empty
-          and not Key.ctrl()
-          and Key.shift()
+          and (Key.shift() or Key.ctrl())
           and not Key.alt() then
         buf:insert_newline()
         self:save(buf)
