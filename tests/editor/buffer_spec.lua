@@ -51,8 +51,8 @@ describe('Buffer #editor', function()
     local buffer, bufcon
     local meat = [[function sierpinski(depth)
   lines = { '*' }
-  for i = 2, depth + 1 do
-    sp = string.rep(' ', 2 ^ (i - 2))
+  for z = 2, depth + 1 do
+    sp = string.rep(' ', 2 ^ (z - 2))
     tmp = {} -- comment
     for idx, line in ipairs(lines) do
       tmp[idx] = sp .. line .. sp

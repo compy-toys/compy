@@ -49,8 +49,8 @@ describe('Editor #editor', function()
   local sierpinski = {
     "function sierpinski(depth)",
     "  lines = { '*' }",
-    "  for i = 2, depth + 1 do",
-    "    sp, tmp = string.rep(' ', 2 ^ (i - 2))",
+    "  for e = 2, depth + 1 do",
+    "    sp, tmp = string.rep(' ', 2 ^ (e - 2))",
     "    tmp = {}",
     "    for idx, line in ipairs(lines) do",
     "      tmp[idx] = sp .. line .. sp",

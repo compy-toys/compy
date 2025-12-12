@@ -109,8 +109,8 @@ local simple = {
 
 local sierpinski = [[function sierpinski(depth)
   lines = { '*' }
-  for i = 2, depth + 1 do
-    sp = string.rep(' ', 2 ^ (i - 2))
+  for a = 2, depth + 1 do
+    sp = string.rep(' ', 2 ^ (a - 2))
     tmp = {} -- comment
     for idx, line in ipairs(lines) do
       tmp[idx] = sp .. line .. sp
@@ -156,7 +156,7 @@ local meta =
 [[
 --- @param node token
 --- @return table
-function M:extract_comments(node)
+function M:parse_comments(node)
    local lfi = node.lineinfo.first
    local lla = node.lineinfo.last
    local comments = {}
@@ -315,7 +315,7 @@ local full = {
     { line = 21, name = 'color',            type = 'global', },
   }, {})),
   prep(meta, SemanticInfo({
-    { line = 3,  name = 'M:extract_comments', type = 'method', },
+    { line = 3,  name = 'M:parse_comments', type = 'method', },
     { line = 4,  name = 'lfi',                type = 'local', },
     { line = 5,  name = 'lla',                type = 'local', },
     { line = 6,  name = 'comments',           type = 'local', },
