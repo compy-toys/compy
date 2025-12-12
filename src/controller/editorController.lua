@@ -621,6 +621,7 @@ function EditorController:_normal_mode_keys(k)
           self:save(buf)
           self.view:refresh()
           self:_move_sel('down', n)
+          buf:clear_loaded()
           self:update_status()
         else
           bufv:follow_selection()
