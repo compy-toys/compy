@@ -6,6 +6,7 @@
 dist/*
 web/dist/*
 web/dist-c/*
+web/wiki/*
 web/node_modules/*
 .debug/*
 doc/scratch/
