@@ -429,6 +429,13 @@ function ConsoleController.prepare_project_env(cc)
   project_env.stop            = function()
     cc:stop_project_run()
   end
+  project_env.run             = function()
+    if love.state.app_state == 'inspect' then
+      cc:stop_project_run()
+      cc:run_project()
+    end
+  end
+  project_env.run_project     = project_env.run
 
   project_env.continue        = function()
     if love.state.app_state == 'inspect' then
