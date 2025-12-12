@@ -415,7 +415,7 @@ return function(lib)
 
         if
             ret:last().tag ~= 'empty' and (
-              --- no empty line at EOF
+            --- no empty line at EOF
               not single
               --- there is an empty line at the end
               or single and (#string.lines(text) > last)
