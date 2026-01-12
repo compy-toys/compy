@@ -318,6 +318,10 @@ return function(lib)
         local idx = 1  -- block number
         local last = 0 -- last line number
         local comment_ids = {}
+        --- Create chunk from comment text and pos
+        --- @param ctext str
+        --- @param c Comment
+        --- @param range Range
         local add_comment_block = function(ctext, c, range)
           ret:insert(
             Chunk.new(ctext, range),
