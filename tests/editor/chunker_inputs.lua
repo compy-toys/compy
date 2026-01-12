@@ -201,5 +201,21 @@ y = 2]], {
     Empty(11),
   }),
 
+  prep([[--- luadoc comment
+function chonky()
+  --- inline comment
+  return {"big", "chungus"}
+end]], {
+    Chunk({ '--- luadoc comment' }, Range(1, 1)),
+    Chunk({
+        'function chonky()',
+        '  --- inline comment',
+        '  return {"big", "chungus"}',
+        'end'
+      },
+      Range(2, 5)
+    ),
+    Empty(6),
+  })
 
 }
