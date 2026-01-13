@@ -98,12 +98,10 @@ end
 --- @return boolean success
 --- @return string? errmsg
 local function run_user_code(f, cc, project_path)
-  local gfx = love.graphics
   local output = cc.model.output
   local env = cc:get_base_env()
 
   local ok, call_err
-  -- gfx.setCanvas(cc:get_canvas())
   cc:use_canvas(function()
     if project_path then
       env = cc:get_project_env()
@@ -118,7 +116,6 @@ local function run_user_code(f, cc, project_path)
     end
     output:restore_main()
   end)
-  -- gfx.setCanvas()
   if not ok then
     local msg = LANG.get_call_error(call_err)
     return false, msg
