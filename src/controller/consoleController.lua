@@ -1056,6 +1056,15 @@ function ConsoleController:get_canvas()
   return self.model.output.canvas
 end
 
+--- @param f function
+function ConsoleController:use_canvas(f)
+  local canvas = self.model.output.canvas
+  gfx.setCanvas(canvas)
+  local r = f()
+  gfx.setCanvas()
+  return r
+end
+
 --- @return ViewData
 function ConsoleController:get_viewdata()
   return {
