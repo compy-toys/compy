@@ -27,6 +27,9 @@ env:
 jobs:
   run-busted:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.sha }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
         with:
