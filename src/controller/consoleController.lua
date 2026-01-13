@@ -773,8 +773,9 @@ end
 function ConsoleController:edit(name, state)
   if love.state.app_state == 'running' then return end
 
-  local PS    = self.model.projects
-  local p     = PS.current
+  local PS = self.model.projects
+  local p  = PS.current
+  if not p then return end
   local filename
   -- if state and state.buffer then
   --   filename = state.buffer.filename
