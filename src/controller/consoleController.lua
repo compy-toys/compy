@@ -441,7 +441,7 @@ function ConsoleController.prepare_project_env(cc)
     if love.state.app_state == 'inspect' then
       -- resume
       love.state.app_state = 'running'
-      cc.main_ctrl.restore_user_handlers()
+      cc.main_ctrl.restore_user_handlers(cc)
     else
       print('No project halted')
     end
