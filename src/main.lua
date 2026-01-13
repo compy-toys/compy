@@ -356,6 +356,8 @@ function love.load()
   ctrl.setup_callback_handlers(CC)
   ctrl.set_default_handlers(CC, CV)
 
+  gfx.setColor(0, 0, 0, 1)
+
   if playback then
     local ok, err = CC:open_project('play', true)
     if not ok then

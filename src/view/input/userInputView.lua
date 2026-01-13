@@ -144,6 +144,7 @@ function UserInputView:render_input(input, status)
   gfx.pop()
 
   if highlight then
+    gfx.push('all')
     local hl = highlight.hl
     local perr = highlight.parse_err
     local el, ec
@@ -209,6 +210,7 @@ function UserInputView:render_input(input, status)
           char, color, colors.bg, selected)
       end
     end
+    gfx.pop()
   else
     gfx.push('all')
     gfx.setColor(colors.fg)
@@ -264,11 +266,13 @@ function UserInputView:render(input, status)
 
   self.canvas:renderTo(function()
     gfx.clear(0, 0, 0, 1)
+    gfx.push('all')
     if isError then
       self:render_error(err_text)
     else
       self:render_input(input, status)
     end
+    gfx.pop()
   end)
 end
 
@@ -280,8 +284,9 @@ function UserInputView:draw()
   local b = self.cfg.statusline_border / 2
   local h = self.start_h - b
   gfx.push('all')
+  gfx.setColor(1, 1, 1, 1)
   gfx.setBlendMode("replace")
-  love.graphics.draw(self.canvas, 0, h)
+  gfx.draw(self.canvas, 0, h)
   gfx.setBlendMode("alpha")
   gfx.pop()
 end

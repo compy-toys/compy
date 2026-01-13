@@ -36,12 +36,16 @@ function EditorView:draw()
     local spec = mode == 'reorder'
     local bv = self:get_current_buffer()
 
+    gfx.push('all')
     if ViewUtils.conditional_draw('show_buffer') then
       bv:draw(spec)
     end
     if ViewUtils.conditional_draw('show_input') then
+      gfx.push('all')
       self.input:draw()
+      gfx.pop()
     end
+    gfx.pop()
   end
 end
 

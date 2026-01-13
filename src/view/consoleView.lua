@@ -60,11 +60,13 @@ function ConsoleView:draw(terminal, canvas, snapshot)
     self.editor:draw()
   end
 
+  gfx.push('all')
   if love.state.app_state == 'editor' then
     drawEditor()
   else
     drawConsole()
   end
+  gfx.pop()
 end
 
 function ConsoleView:draw_placeholder()
