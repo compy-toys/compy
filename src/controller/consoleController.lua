@@ -102,21 +102,23 @@ local function run_user_code(f, cc, project_path)
   local output = cc.model.output
   local env = cc:get_base_env()
 
-  gfx.setCanvas(cc:get_canvas())
   local ok, call_err
-  if project_path then
-    env = cc:get_project_env()
-  end
-  ok, call_err = pcall(f)
-  if project_path and ok then -- user project exec
-    if love.PROFILE then
-      love.PROFILE.frame = 0
-      love.PROFILE.report = {}
-    end
     cc.main_ctrl.set_user_handlers(env['love'])
-  end
-  output:restore_main()
-  gfx.setCanvas()
+  -- gfx.setCanvas(cc:get_canvas())
+  cc:use_canvas(function()
+    if project_path then
+      env = cc:get_project_env()
+    end
+    ok, call_err = pcall(f)
+    if project_path and ok then -- user project exec
+      if love.PROFILE then
+        love.PROFILE.frame = 0
+        love.PROFILE.report = {}
+      end
+    end
+    output:restore_main()
+  end)
+  -- gfx.setCanvas()
   if not ok then
     local msg = LANG.get_call_error(call_err)
     return false, msg
