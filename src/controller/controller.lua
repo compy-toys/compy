@@ -76,7 +76,12 @@ end
 --- @return function
 local function error_wrapper(f, C)
   return function(...)
-    return wrap(f, C, ...)
+    local args = { ... }
+    C:use_canvas(
+      function()
+        return wrap(f, C, unpack(args))
+      end
+    )
   end
 end
 
@@ -403,7 +408,9 @@ Controller = {
       local uup = Controller._userhandlers.update
       if user_update and uup
       then
+        C:use_canvas(function()
           wrap(uup, C, dt)
+        end)
       end
       if love.state.app_state == 'snapshot' then
         gfx.captureScreenshot(function(img)

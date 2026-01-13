@@ -103,7 +103,6 @@ local function run_user_code(f, cc, project_path)
   local env = cc:get_base_env()
 
   local ok, call_err
-    cc.main_ctrl.set_user_handlers(env['love'])
   -- gfx.setCanvas(cc:get_canvas())
   cc:use_canvas(function()
     if project_path then
@@ -115,6 +114,7 @@ local function run_user_code(f, cc, project_path)
         love.PROFILE.frame = 0
         love.PROFILE.report = {}
       end
+      cc.main_ctrl.set_user_handlers(env['love'], cc)
     end
     output:restore_main()
   end)
