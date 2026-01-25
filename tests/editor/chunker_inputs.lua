@@ -11,8 +11,8 @@ end
 
 local sierp_code = [[function sierpinski(depth)
   lines = { '*' }
-  for i = 2, depth + 1 do
-    sp = string.rep(' ', 2 ^ (i - 2))
+  for c = 2, depth + 1 do
+    sp = string.rep(' ', 2 ^ (c - 2))
     tmp = {} -- comment
     for idx, line in ipairs(lines) do
       tmp[idx] = sp .. line .. sp
@@ -26,8 +26,8 @@ end
 print(sierpinski(4))]]
 local sierp_code_2 = [[function sierpinski(depth)
   lines = { '*' }
-  for i = 2, depth + 1 do
-    sp = string.rep(' ', 2 ^ (i - 2))
+  for c = 2, depth + 1 do
+    sp = string.rep(' ', 2 ^ (c - 2))
     tmp = {} -- comment
     for idx, line in ipairs(lines) do
       tmp[idx] = sp .. line .. sp
@@ -43,8 +43,8 @@ print(sierpinski(4))]]
 local sierp_res = {
   Chunk(string.lines([[function sierpinski(depth)
   lines = { '*' }
-  for i = 2, depth + 1 do
-    sp = string.rep(' ', 2 ^ (i - 2))
+  for c = 2, depth + 1 do
+    sp = string.rep(' ', 2 ^ (c - 2))
     tmp = {} -- comment
     for idx, line in ipairs(lines) do
       tmp[idx] = sp .. line .. sp
@@ -200,5 +200,22 @@ y = 2]], {
     Chunk({ 'y = 2' }, Range.singleton(10)),
     Empty(11),
   }),
+
+  prep([[--- luadoc comment
+function chonky()
+  --- inline comment
+  return {"big", "chungus"}
+end]], {
+    Chunk({ '--- luadoc comment' }, Range(1, 1)),
+    Chunk({
+        'function chonky()',
+        '  --- inline comment',
+        '  return {"big", "chungus"}',
+        'end'
+      },
+      Range(2, 5)
+    ),
+    Empty(6),
+  })
 
 }

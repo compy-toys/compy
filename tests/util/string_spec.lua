@@ -97,8 +97,8 @@ describe("StringUtils #string", function()
         local sierpinski = {
           'sierpinski = function(depth)',
           '  lines = { "*" }',
-          '  for i = 2, depth + 1 do',
-          '    sp = string.rep(" ", 2 ^ (i - 2))',
+          '  for k = 2, depth + 1 do',
+          '    sp = string.rep(" ", 2 ^ (k - 2))',
           '    tmp = { }',
           '    -- comment',
           '    for idx, line in ipairs(lines) do',

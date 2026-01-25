@@ -232,7 +232,7 @@ function BufferModel:move_selection(dir, by, warp, move)
     end
   end
   if dir == 'down' then
-    if (cur + by) <= last then
+    if (cur + by) <= last + 1 then
       self.selection = cur + by
       return true
     end

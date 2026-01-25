@@ -68,38 +68,39 @@ describe('parser #ast', function()
               io.write(string.rep('=', 80))
               print(Debug.text_table(input))
             end
-            local has_lines = false
-            local seen_comments = {}
-            for _, v in ipairs(r) do
-              if show_ast then
-                local fn = string.format('%s_input_%d', tag, i)
 
-                local skip_lineinfo = true
-                local tree = Debug.terse_ast(r, skip_lineinfo)
-                local f = string.format('/*\n%s\n*/\n%s',
-                  string.unlines(input),
-                  tree
-                )
-                FS.write_tempfile(f, 'json5', fn)
-              end
-
-              has_lines = true
-              local ct, _ = do_code(v, seen_comments)
-              for _, cl in ipairs(string.lines(ct) or {}) do
-                table.insert(result, cl)
-              end
-            end
-            --- corner case, e.g comments only
-            --- it is valid code, but gets parsed a bit differently
-            if not has_lines then
-              result = string.lines(do_code(r)) or {}
-            end
-
-            --- remove trailing newline
-            if result[#result] == '' then
-              table.remove(result)
-            end
             it('matches ' .. i, function()
+              local has_lines = false
+              local seen_comments = {}
+              for _, v in ipairs(r) do
+                if show_ast then
+                  local fn = string.format('%s_input_%d', tag, i)
+
+                  local skip_lineinfo = false
+                  local tree = Debug.terse_ast(r, skip_lineinfo)
+                  local f = string.format('/*\n%s\n*/\n%s',
+                    string.unlines(input),
+                    tree
+                  )
+                  FS.write_tempfile(f, 'json5', fn)
+                end
+
+                has_lines = true
+                local ct, _ = do_code(v, seen_comments)
+                for _, cl in ipairs(string.lines(ct) or {}) do
+                  table.insert(result, cl)
+                end
+              end
+              --- corner case, e.g comments only
+              --- it is valid code, but gets parsed a bit differently
+              if not has_lines then
+                result = string.lines(do_code(r)) or {}
+              end
+
+              --- remove trailing newline
+              if result[#result] == '' then
+                table.remove(result)
+              end
               assert.same(output, result)
               assert.is_true(parser.parse(output))
             end)

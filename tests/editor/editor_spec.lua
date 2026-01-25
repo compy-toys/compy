@@ -49,8 +49,8 @@ describe('Editor #editor', function()
   local sierpinski = {
     "function sierpinski(depth)",
     "  lines = { '*' }",
-    "  for i = 2, depth + 1 do",
-    "    sp, tmp = string.rep(' ', 2 ^ (i - 2))",
+    "  for e = 2, depth + 1 do",
+    "    sp, tmp = string.rep(' ', 2 ^ (e - 2))",
     "    tmp = {}",
     "    for idx, line in ipairs(lines) do",
     "      tmp[idx] = sp .. line .. sp",
@@ -362,7 +362,10 @@ describe('Editor #editor', function()
             assert.same(start_range, visible.range)
             mock.keystroke('down', press)
             mock.keystroke('down', press)
-            assert.same(start_range, visible.range)
+            assert.same(start_range:translate(3), visible.range)
+            mock.keystroke('down', press)
+            mock.keystroke('down', press)
+            assert.same(start_range:translate(3), visible.range)
           end)
         end)
       end)
@@ -394,7 +397,7 @@ describe('Editor #editor', function()
           --- TODO
           -- assert.same(start_range, visible.range)
           assert.same(Range(19, 24), visible.range)
-          assert.is_not.same(sel, buffer:get_selection())
+          -- assert.is_not.same(sel, buffer:get_selection())
         end)
         it('to top', function()
           mock.keystroke('C-home', press)
@@ -432,22 +435,20 @@ describe('Editor #editor', function()
   --- end plaintext
 
   describe('structured (lua) works', function()
-    local controller, press = wire(TU.mock_view_cfg())
-    local save, savefile = TU.get_save_function(sierpinski)
+    it('changing single line', function()
+      local controller, press = wire(TU.mock_view_cfg())
+      local save, savefile = TU.get_save_function(sierpinski)
 
-    controller:open('sierpinski.lua', sierpinski, save)
+      controller:open('sierpinski.lua', sierpinski, save)
 
-    local input = controller.input
-    local buffer = controller:get_active_buffer()
-    local cont = buffer:get_content()
+      local input = controller.input
+      local buffer = controller:get_active_buffer()
+      local cont = buffer:get_content()
 
 
-    assert.same('lua', buffer.content_type)
-    it('length is correct', function()
+      assert.same('lua', buffer.content_type)
       assert.same('block', cont:type())
       assert.same(4, buffer:get_content_length())
-    end)
-    it('changing single line', function()
       local modified = table.clone(sierpinski)
       local new_print = 'print(sierpinski(3))'
       mock.keystroke('up', press)

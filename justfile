@@ -20,9 +20,9 @@ unit_test_brief:
   @{{MON}} -e 'lua' --exec 'echo -en "\n\n\n\n------------- BUSTED -------------\n"; busted tests -o tests/brief_output.lua'
 unit_test_tag TAG:
   @{{MON}} -e lua \
-    --exec 'echo -en "\n\n\n\n------------- BUSTED -------------\n" ; busted tests --defer-print  --tags {{TAG}}'
+    --exec 'echo -en "\n\n\n\n------------- BUSTED -------------\n" ; busted tests --defer-print --tags="{{TAG}}"'
 unit_test_ast:
-  @SHOW_AST=1 just unit_test_tag ast
+  @just unit_test_tag ast
 unit_test_src:
   @SHOW_CODE=1 just unit_test_tag src
 unit_test_parser:

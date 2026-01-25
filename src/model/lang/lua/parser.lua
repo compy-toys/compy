@@ -7,11 +7,9 @@ require("util.dequeue")
 
 --- @class luaAST : token
 
---- @alias CPos 'first'|'last'
-
 --- @class Comment
 --- @field text string
---- @field position CPos
+--- @field position CommentPos
 --- @field idf integer
 --- @field idl integer
 --- @field first Cursor
@@ -318,6 +316,10 @@ return function(lib)
         local idx = 1  -- block number
         local last = 0 -- last line number
         local comment_ids = {}
+        --- Create chunk from comment text and pos
+        --- @param ctext str
+        --- @param c Comment
+        --- @param range Range
         local add_comment_block = function(ctext, c, range)
           ret:insert(
             Chunk.new(ctext, range),
@@ -326,7 +328,7 @@ return function(lib)
           comment_ids[c.idl] = true
         end
         --- @param comments Comment[]
-        --- @param pos CPos
+        --- @param pos CommentPos
         local get_comments = function(comments, pos)
           for _, c in ipairs(comments) do
             -- Log.warn('c', c.position)
@@ -415,7 +417,7 @@ return function(lib)
 
         if
             ret:last().tag ~= 'empty' and (
-              --- no empty line at EOF
+            --- no empty line at EOF
               not single
               --- there is an empty line at the end
               or single and (#string.lines(text) > last)

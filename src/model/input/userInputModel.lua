@@ -857,7 +857,7 @@ function UserInputModel:get_wrapped_error()
     local we = string.wrap_array(
       e,
       self.visible.wrap_w)
-      table.insert(we, 1, 'Errors:')
+    table.insert(we, 1, 'Errors:')
     return we
   end
 end
@@ -880,7 +880,10 @@ end
 
 --- @return boolean
 function UserInputModel:has_error()
-  return string.is_non_empty_string_array(self.error)
+  if self.error and #(self.error) > 0 then
+    return true
+  end
+  return false
 end
 
 --- @param eval Evaluator

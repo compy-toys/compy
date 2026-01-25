@@ -353,9 +353,10 @@ function love.load()
   local CC = ConsoleController(CM, ctrl)
   local CV = ConsoleView(baseconf, CC)
 
-  ctrl.init(CC, mode)
   ctrl.setup_callback_handlers(CC)
   ctrl.set_default_handlers(CC, CV)
+
+  gfx.setColor(0, 0, 0, 1)
 
   if playback then
     local ok, err = CC:open_project('play', true)

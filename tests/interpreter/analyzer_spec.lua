@@ -11,10 +11,6 @@ if not orig_print then
   _G.orig_print = print
 end
 
--- when testing with Lua5.3
-if not _G.unpack then
-  _G.unpack = table.unpack
-end
 
 local w = 64
 
@@ -88,6 +84,7 @@ describe('analyzer #analyzer', function()
                 end
 
                 local ct, _ = do_code(v, seen_comments)
+
                 for _, cl in ipairs(string.lines(ct) or {}) do
                   table.insert(result, cl)
                 end

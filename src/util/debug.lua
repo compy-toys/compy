@@ -199,9 +199,13 @@ local function terse_ast(ast, skip_lineinfo, style)
 
           if type(k) == 'table' then
             res = res .. dent .. terse(k, omit, style) .. assign
-          elseif type(k) == 'number' and style == 'lua' then
-            -- skip index
-            res = res .. dent .. '[' .. k .. '] ' .. assign
+          elseif type(k) == 'number' then
+            if style == 'lua' then
+              -- skip index
+              res = res .. dent .. '[' .. k .. '] ' .. assign
+            elseif style == 'json5' then
+              res = res .. dent .. '"' .. k .. '"' .. assign
+            end
           elseif type(k) == 'string'
               and not string.forall(k, Char.is_ascii)
           then
@@ -320,7 +324,7 @@ Debug = {
     if type(t) == 'table' then
       local start = math.max(1, skip or 0)
       for i = start, #t do
-        local l = t[i] or ''
+        local l = tostring(t[i]) or ''
         local line = (function()
           if not no_ln then
             return string.format("#%02d: %s\n", i, text(l))

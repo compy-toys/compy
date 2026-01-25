@@ -5,11 +5,11 @@ local function set_print(M)
   local origPrint = _G.print
   _G.orig_print = origPrint
   local magicPrint = function(...)
-    local arg = { ... }
     local out = ''
-    local l = #arg
-    for i, v in ipairs(arg) do
-      out = out .. tostring(v)
+    local l = select('#', ...)
+    local args = { ... }
+    for i = 1, l do
+      out = out .. tostring(args[i])
       if i ~= l then out = out .. '\t' end
     end
     origPrint(out)

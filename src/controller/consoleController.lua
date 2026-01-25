@@ -98,25 +98,24 @@ end
 --- @return boolean success
 --- @return string? errmsg
 local function run_user_code(f, cc, project_path)
-  local gfx = love.graphics
   local output = cc.model.output
   local env = cc:get_base_env()
 
-  gfx.setCanvas(cc:get_canvas())
   local ok, call_err
-  if project_path then
-    env = cc:get_project_env()
-  end
-  ok, call_err = pcall(f)
-  if project_path and ok then -- user project exec
-    if love.PROFILE then
-      love.PROFILE.frame = 0
-      love.PROFILE.report = {}
+  cc:use_canvas(function()
+    if project_path then
+      env = cc:get_project_env()
     end
-    cc.main_ctrl.set_user_handlers(env['love'])
-  end
-  output:restore_main()
-  gfx.setCanvas()
+    ok, call_err = pcall(f)
+    if project_path and ok then -- user project exec
+      if love.PROFILE then
+        love.PROFILE.frame = 0
+        love.PROFILE.report = {}
+      end
+      cc.main_ctrl.set_user_handlers(env['love'], cc)
+    end
+    output:restore_main()
+  end)
   if not ok then
     local msg = LANG.get_call_error(call_err)
     return false, msg
@@ -429,12 +428,19 @@ function ConsoleController.prepare_project_env(cc)
   project_env.stop            = function()
     cc:stop_project_run()
   end
+  project_env.run             = function()
+    if love.state.app_state == 'inspect' then
+      cc:stop_project_run()
+      cc:run_project()
+    end
+  end
+  project_env.run_project     = project_env.run
 
   project_env.continue        = function()
     if love.state.app_state == 'inspect' then
       -- resume
       love.state.app_state = 'running'
-      cc.main_ctrl.restore_user_handlers()
+      cc.main_ctrl.restore_user_handlers(cc)
     else
       print('No project halted')
     end
@@ -766,8 +772,9 @@ end
 function ConsoleController:edit(name, state)
   if love.state.app_state == 'running' then return end
 
-  local PS    = self.model.projects
-  local p     = PS.current
+  local PS = self.model.projects
+  local p  = PS.current
+  if not p then return end
   local filename
   -- if state and state.buffer then
   --   filename = state.buffer.filename
@@ -1046,6 +1053,15 @@ end
 --- @return love.Canvas
 function ConsoleController:get_canvas()
   return self.model.output.canvas
+end
+
+--- @param f function
+function ConsoleController:use_canvas(f)
+  local canvas = self.model.output.canvas
+  gfx.setCanvas(canvas)
+  local r = f()
+  gfx.setCanvas()
+  return r
 end
 
 --- @return ViewData

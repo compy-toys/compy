@@ -43,27 +43,27 @@ local _supported = {
   'touchreleased',
 }
 
-local _C, _mode
-
+--- @param C ConsoleController
 --- @param msg string
-local function user_error_handler(msg)
+local function user_error_handler(C, msg)
   Log.debug('user error: ' .. msg)
   local err = LANG.get_call_error(msg) or ''
   local user_msg = messages.exec_error(err)
-  _C:suspend_run(user_msg)
+  C:suspend_run(user_msg)
   print(user_msg)
 end
 
 --- @param f function
+--- @param C ConsoleController
 --- @param ...   any
 --- @return boolean success
 --- @return any result
 --- @return any ...
-local function wrap(f, ...)
+local function wrap(f, C, ...)
   if _G.web then
     local ok, r = pcall(f, ...)
     if not ok then
-      user_error_handler(r)
+      user_error_handler(C, r)
     end
     return r
   else
@@ -72,22 +72,29 @@ local function wrap(f, ...)
 end
 
 --- @param f function
+--- @param C ConsoleController
 --- @return function
-local function error_wrapper(f)
+local function error_wrapper(f, C)
   return function(...)
-    return wrap(f, ...)
+    local args = { ... }
+    C:use_canvas(
+      function()
+        return wrap(f, C, unpack(args))
+      end
+    )
   end
 end
 
 --- @param userlove table
-local set_handlers = function(userlove)
+--- @param C ConsoleController
+local set_handlers = function(userlove, C)
   --- @param key string
   local function hook_if_differs(key)
     local orig = Controller._defaults[key]
     local new = userlove[key]
     if orig and new and orig ~= new then
       --- @type function
-      love[key] = error_wrapper(new)
+      love[key] = error_wrapper(new, C)
     end
   end
 
@@ -384,7 +391,7 @@ Controller = {
         local draw = function()
           if ldr then
             gfx.push('all')
-            wrap(ldr)
+            wrap(ldr, C)
             gfx.pop()
           end
           local ui = get_user_input()
@@ -401,7 +408,9 @@ Controller = {
       local uup = Controller._userhandlers.update
       if user_update and uup
       then
-        wrap(uup, dt)
+        C:use_canvas(function()
+          wrap(uup, C, dt)
+        end)
       end
       if love.state.app_state == 'snapshot' then
         gfx.captureScreenshot(function(img)
@@ -477,11 +486,6 @@ Controller = {
   ----------------
   ---  public  ---
   ----------------
-  --- @param CC ConsoleController
-  init = function(CC, mode)
-    _C = CC
-    _mode = mode
-  end,
   --- @param C ConsoleController
   --- @param CV ConsoleView
   set_default_handlers = function(C, CV)
@@ -804,8 +808,9 @@ Controller = {
     save_if_differs('draw')
   end,
 
-  restore_user_handlers = function()
-    set_handlers(Controller._userhandlers)
+  --- @param C ConsoleController
+  restore_user_handlers = function(C)
+    set_handlers(Controller._userhandlers, C)
   end,
 
   clear_user_handlers = function()
