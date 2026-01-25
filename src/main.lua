@@ -10,6 +10,7 @@ require("view.consoleView")
 local colors = require("conf.colors")
 local hostconf = prequire('host')
 
+require("util.lua")
 require("util.key")
 require("util.debug")
 local FS = require("util.filesystem")
@@ -81,7 +82,12 @@ local config_view = function(flags)
   end
 
   local drawableChars = math.floor(drawableWidth / fw)
-  if love.DEBUG then drawableChars = drawableChars - 3 end
+
+  if love.DEBUG then
+    drawableChars = parse_int(os.getenv("COMPY_WRAP"))
+        or drawableChars - 3
+    lines = parse_int(os.getenv("COMPY_LINES")) or lines
+  end
 
   return {
     font = font_main,

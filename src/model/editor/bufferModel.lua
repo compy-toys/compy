@@ -20,7 +20,6 @@ local function render_blocks(blocks)
       ret:append_all(v.lines)
     end
   end
-  ret:append('')
   return ret
 end
 
@@ -51,7 +50,10 @@ local function new(
   local function plaintext()
     ct = 'plain'
     _content = Dequeue(lines, 'string')
-    sel = #_content + 1
+    if _content:last() ~= '' then
+      _content:push('')
+    end
+    sel = #_content
   end
   --- only passing this around so the linter shuts up about nil
   --- @param chk function
@@ -60,7 +62,7 @@ local function new(
     local ok, blocks = chk(lines)
     if ok then
       local len = #blocks
-      sel = len + 1
+      sel = len
     else
       readonly = true
       sel = 1
@@ -153,7 +155,7 @@ function BufferModel:rechunk()
 end
 
 function BufferModel:save()
-  self:highlight()
+  self:_text_change()
   local text = self:get_text_content()
   self:analyze()
   return self.save_file(text)
@@ -207,7 +209,7 @@ function BufferModel:move_selection(dir, by, warp, move)
   local l = self:get_content_length()
   local last = (function()
     if move then return l end
-    return l + 1
+    return l
   end)()
   if warp then
     if dir == 'up' then
@@ -303,9 +305,13 @@ function BufferModel:_text_change(rechunk)
       self:rechunk()
       self:rechunk()
     end
-  end
-  if self.content_type == 'md' then
+  else
     self:highlight()
+    local ll = self.content:last()
+    if ll ~= '' then
+      -- Log.warn('asd')
+      self.content:push('')
+    end
   end
 end
 
@@ -315,13 +321,8 @@ function BufferModel:delete_selected_text()
     local sb = self.content[sel]
     if not sb then return end
 
-    local l = sb.pos:len()
     self.content:remove(sel)
-    for i = sel, self:get_content_length() do
-      local b = self.content[i]
-      local r = b.pos
-      b.pos = r:translate(-l)
-    end
+    self:rechunk()
   else
     self.content:remove(sel)
   end
@@ -329,21 +330,23 @@ function BufferModel:delete_selected_text()
 end
 
 --- @param t string[]|Block[]
+--- @param coord integer?
 --- @return boolean insert
 --- @return integer? inserted_lines
-function BufferModel:replace_selected_text(t)
+function BufferModel:replace_content(t, coord)
   if self.content_type == 'lua' then
     local chunks = t
     local n = #chunks
     if n == 0 then
       return false
     end
-    local sel = self.selection
+    local blocknum = coord or self:get_selection()
+    local rechunk = false
     --- content start and original length
     local cs, ol = (function()
-      local current = self.content[sel]
+      local current = self.content[blocknum]
       if current then
-        return current.pos.start, self.content[sel].pos:len()
+        return current.pos.start, self.content[blocknum].pos:len()
       end
       local last = self.content:last()
       if last then
@@ -357,33 +360,34 @@ function BufferModel:replace_selected_text(t)
       local c = chunks[1]
       local nr = c.pos:translate(cs - 1)
       c.pos = nr
-      self.content[sel] = chunks[1]
+      self.content[blocknum] = chunks[1]
     else
       --- remove old chunk
-      self.content:remove(sel)
+      self.content:remove(blocknum)
       --- insert new version of the chunk(s)
       for i = #chunks, 1, -1 do
         local c = chunks[i]
         local nr = c.pos:translate(cs - 1)
         c.pos = nr
-        self.content:insert(c, sel)
+        self.content:insert(c, blocknum)
       end
+      rechunk = true
     end
     --- move subsequent chunks down
     local diff = chunks[n].pos:len() - ol
     if diff ~= 0 then
-      for i = sel + 1, self:get_content_length() do
+      for i = blocknum + 1, self:get_content_length() do
         local b = self.content[i]
         b.pos = b.pos:translate(diff)
       end
     end
 
-    self:_text_change()
+    self:_text_change(rechunk)
     return true, n
   else
-    local sel = self.selection
+    local linenum = coord or self:get_selection()
     local clen = #(self.content)
-    local ti = sel
+    local ti = linenum
     if #t == 1 then
       self.content[ti] = t[1]
       if ti > clen then
@@ -403,26 +407,92 @@ function BufferModel:replace_selected_text(t)
 end
 
 --- Insert a new line or empty block _before_ the selection
+--- Returns true if a block/line was inserted
 --- @param i integer?
+--- @return boolean?
 function BufferModel:insert_newline(i)
   --- block or line number
   local bln = i or self:get_selection()
   if self.content_type == 'lua' then
-    local sb = self.content[bln]
-    if not sb then return end
+    local b = self.content[bln]
+    if not b then return end
+
     local prev_b = self.content[bln - 1]
     -- disallow consecutive empties
     local prev_empty = prev_b and prev_b:is_empty()
-    local sel_empty = sb:is_empty()
+    local sel_empty = b:is_empty()
     local cons = prev_empty or sel_empty
     if cons then return end
 
     local ln = self:get_selection_start_line()
     self.content:insert(Empty(ln), bln)
     self:_text_change(true)
+    return true
   else
     self.content:insert('', bln)
     self:_text_change()
+    return true
+  end
+end
+
+--- Insert new lines or blocks
+--- Returns success flag and number of inserted
+--- @param t string[]|Block[]
+--- @param lbn integer?
+--- @return boolean?
+--- @return integer? inserted_lines
+function BufferModel:insert_content(t, lbn)
+  local num = lbn or self:get_selection()
+  local len = self:get_content_length() + 1
+  if lbn < 1 or lbn > len then
+    return false
+  end
+  if self.content_type == 'lua' then
+    local chunks = t
+    local n = #chunks
+    if n == 0 then
+      return false
+    end
+    --- content start and original length
+    local cs, ol = (function()
+      local current = self.content[num]
+      if current then
+        return current.pos.start,
+            self.content[num].pos:len()
+      end
+      local last = self.content:last()
+      if last then
+        return self.content:last().pos.fin + 1, 0
+      else --- empty file
+        return 1, 0
+      end
+    end)()
+
+    for i = #chunks, 1, -1 do
+      local c = chunks[i]
+      local nr = c.pos:translate(cs - 1)
+      c.pos = nr
+      self.content:insert(c, num)
+    end
+
+    --- move subsequent chunks down
+    local diff = chunks[n].pos:len() - ol
+    if diff ~= 0 then
+      for i = num + 1, self:get_content_length() do
+        local b = self.content[i]
+        b.pos = b.pos:translate(diff)
+      end
+    end
+
+    self:_text_change(true)
+    return true, n
+  else
+    local ti = num
+    for i = #t, 1, -1 do
+      self.content:insert(t[i], ti)
+    end
+    self:_text_change()
+    return true, #t
   end
 end
 

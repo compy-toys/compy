@@ -113,14 +113,18 @@ function Project:load_file(filename)
   end
 end
 
+--- @param get_env fun(): LuaEnv
 --- @return function
-function Project:get_loader()
+function Project:get_loader(get_env)
   --- @param modname string
   --- @return unknown|string
   return function(modname)
     local fn = modname .. '.lua'
     local f = self:load_file(fn)
+    Log.debug(string.format("%s loader, loading %s",
+      self.name, modname))
     if f then
+      setfenv(f, get_env())
       return assert(f)
     else
       return string.format(
@@ -289,11 +293,11 @@ function ProjectService:opreate(name, play)
     local ok = self:open('play', true)
     return ok, false
   else
-    local ook, _ = self:open(name)
+    local ook, _ = self:open(name, false)
     if ook then
       return ook, false
     else
-      local cok, c_err = self:create(name)
+      local cok, c_err = self:create(name, false)
       if cok then
         self:open(name)
         return false, cok
@@ -362,7 +366,7 @@ function ProjectService:clone(old, new)
 end
 
 --- @param name string
---- @param env table
+--- @param env LuaEnv
 --- @return function?
 --- @return string? error
 --- @return string? path

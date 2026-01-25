@@ -17,3 +17,16 @@ EditorModel = class.create(function(cfg)
     cfg = cfg,
   }
 end)
+
+--- @return {name: string, content: string[]}[]
+function EditorModel:get_buffers_content()
+  local ret = {}
+  for _, buf in ipairs(self.buffers) do
+    local b = {
+      name = buf.name,
+      content = buf:get_text_content(),
+    }
+    table.insert(ret, b)
+  end
+  return ret
+end

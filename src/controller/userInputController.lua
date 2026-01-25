@@ -1,5 +1,6 @@
 local class = require('util.class')
 require("util.key")
+require("util.view")
 require("util.string.string")
 
 --- @param model UserInputModel
@@ -131,7 +132,7 @@ function UserInputController:clear_error()
   self.model:clear_error()
 end
 
---- @param error string[]?
+--- @param error string[]|Error[]?
 function UserInputController:set_error(error)
   self.model:set_error(error)
 end
@@ -144,8 +145,9 @@ end
 --- @return boolean
 --- @return Error[]
 function UserInputController:evaluate()
+  local ok, res = self.model:handle(true)
   self:update_view()
-  return self.model:handle(true)
+  return ok, res
 end
 
 function UserInputController:cancel()

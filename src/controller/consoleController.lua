@@ -10,6 +10,13 @@ require("util.key")
 require("util.table")
 local TerminalTest = require("util.test_terminal")
 
+local messages = {
+  file_does_not_exist = function(name)
+    local n = name or ''
+    return 'cannot open ' .. n .. ': No such file or directory'
+  end,
+}
+
 --- @class ConsoleController
 --- @field time number
 --- @field model Model
@@ -161,26 +168,30 @@ function ConsoleController:run_project(name)
       { "There's already a project running!" })
     return
   end
-  local P = self.model.projects
+  local P   = self.model.projects
+  local cur = P.current
   local ok
-  if P.current then
+  if cur and (not name or cur.name == name) then
     ok = true
   else
     ok = self:open_project(name, false)
   end
+
   if ok then
-    local runner_env        = self:get_project_env()
+    local runner_env = self:get_project_env()
     local f, load_err, path = P:run(name, runner_env)
     if f then
       local n = name or P.current.name or 'project'
       Log.info('Running \'' .. n .. '\'')
+      love.state.app_state = 'running'
       local rok, run_err = run_user_code(f, self, path)
-      if rok then
-        if self.main_ctrl.user_is_blocking() then
-          love.state.app_state = 'running'
-        end
-      else
+      if not rok then
+        love.state.app_state = 'project_open'
         print('Error: ', run_err)
+      else
+        if not self.main_ctrl.user_is_blocking() then
+          love.state.app_state = 'project_open'
+        end
       end
     else
       --- TODO extract error message here
@@ -189,31 +200,44 @@ function ConsoleController:run_project(name)
   end
 end
 
-_G.o_require = _G.require
---- @param cc ConsoleController
+local o_require = _G.require
+_G.o_require = o_require
 --- @param name string
-local function project_require(cc, name)
+--- @param run 'run'?
+local function project_require(name, run)
+  if run then
+    Log.info('req', name)
+  end
+  if _G.web and name == 'bit' then
+    return o_require('util.luabit')
+  else
+    return o_require(name)
+  end
+end
+
+_G.o_dofile = _G.dofile
+--- @param cc ConsoleController
+--- @param filename string
+--- @param env LuaEnv?
+local function project_dofile(cc, filename, env)
   local P = cc.model.projects
-  local fn = name .. '.lua'
+  local fn = filename
   local open = P.current
   if open then
     local chunk = open:load_file(fn)
-    local pr_env = cc:get_project_env()
     if chunk then
-      setfenv(chunk, pr_env)
-      return chunk()
-    else
-      --- hack around love.js not having the bit lib
-      if name == 'bit' and _G.web then
-        ---@diagnostic disable-next-line: inject-field
-        pr_env.bit = o_require('util.luabit')
+      if env then
+        setfenv(chunk, env)
       end
+      return true, chunk()
+    else
+      print(messages.file_does_not_exist(filename))
     end
-    --- TODO: is it desirable to allow out-of-project require?
-    -- else
-    -- _require(name)
   end
 end
+
+-- Set up audio table
+local compy_audio = require("util.audio")
 
 function ConsoleController.prepare_env(cc)
   local prepared            = cc.main_env
@@ -222,7 +246,7 @@ function ConsoleController.prepare_env(cc)
   local P                   = cc.model.projects
 
   prepared.require          = function(name)
-    return project_require(cc, name)
+    return project_require(name)
   end
 
   --- @param f function
@@ -232,6 +256,14 @@ function ConsoleController.prepare_env(cc)
     else
       return f(...)
     end
+  end
+
+  prepared.require          = project_require
+
+  prepared.dofile           = function(name)
+    return check_open_pr(function()
+      return project_dofile(cc, name)
+    end)
   end
 
   prepared.list_projects    = function()
@@ -344,7 +376,8 @@ function ConsoleController.prepare_env(cc)
       clear = function()
         return terminal:clear()
       end
-    }
+    },
+    audio = compy_audio,
   }
   prepared.compy            = compy_namespace
   prepared.tty              = compy_namespace.terminal
@@ -375,9 +408,19 @@ function ConsoleController.prepare_project_env(cc)
   local project_env           = cc:get_pre_env_c()
   project_env.gfx             = love.graphics
 
+  project_env.compy           = {
+    audio = compy_audio
+  }
+
   project_env.require         = function(name)
-    return project_require(cc, name)
+    return project_require(name)
   end
+  project_env.dofile          = function(name)
+    return project_dofile(cc, name, cc:get_project_env())
+  end
+  -- project_env.require         = function(name)
+  --   return project_require(name, 'run')
+  -- end
 
   --- @param msg string?
   project_env.pause           = function(msg)
@@ -548,13 +591,13 @@ function ConsoleController:restart()
 end
 
 ---@return LuaEnv
-function ConsoleController:get_console_env()
-  return self.main_env
+function ConsoleController:get_pre_env_c()
+  return table.clone(self.pre_env)
 end
 
 ---@return LuaEnv
-function ConsoleController:get_pre_env_c()
-  return table.clone(self.pre_env)
+function ConsoleController:get_console_env()
+  return self.main_env
 end
 
 ---@return LuaEnv
@@ -565,6 +608,18 @@ end
 ---@return LuaEnv
 function ConsoleController:get_base_env()
   return self.base_env
+end
+
+---@return LuaEnv
+function ConsoleController:get_effective_env()
+  if
+      love.state.app_state == 'running'
+      or love.state.app_state == 'inspect'
+  then
+    return self:get_project_env()
+  else
+    return self:get_console_env()
+  end
 end
 
 ---@param t LuaEnv
@@ -615,19 +670,20 @@ function ConsoleController:open_project(name, play)
     print('No project name provided!')
     return false
   end
+  local cur = P.current
+  if cur then
+    self:close_project()
+  end
+
   local open, create, err = P:opreate(name, play)
   local ok = open or create
   if ok then
-    local project_loader = (function()
-      local cached = self.loaders[name]
-      if cached then
-        return cached
-      else
-        local loader = P.current:get_loader()
-        self:cache_loader(name, loader)
-        return loader
-      end
-    end)()
+    local project_loader =
+        P.current:get_loader(function()
+          return self:get_effective_env()
+        end)
+    self:cache_loader(name, project_loader)
+
     if not table.is_member(package.loaders, project_loader)
     then
       table.insert(package.loaders, 1, project_loader)
@@ -664,7 +720,30 @@ function ConsoleController:close_project()
   return true
 end
 
+--- @return Project?
+function ConsoleController:get_current_project()
+  local P = self.model.projects
+  return P.current
+end
+
+function ConsoleController:evacuate_required()
+  local open = self:get_current_project()
+  if not open then return end
+  local files = open:contents()
+  local lua = '.lua$'
+  for _, v in ipairs(files) do
+    if string.matches(v.name, lua, true) then
+      local fn = v.name
+      local modname = fn:gsub(lua, '')
+      if package.loaded[modname] then
+        package.loaded[modname] = nil
+      end
+    end
+  end
+end
+
 function ConsoleController:stop_project_run()
+  self:evacuate_required()
   self.main_ctrl.set_default_handlers(self, self.view)
   self.main_ctrl.set_love_update(self)
   love.state.user_input = nil
@@ -687,14 +766,14 @@ end
 function ConsoleController:edit(name, state)
   if love.state.app_state == 'running' then return end
 
-  local PS = self.model.projects
-  local p  = PS.current
+  local PS    = self.model.projects
+  local p     = PS.current
   local filename
-  if state and state.buffer then
-    filename = state.buffer.filename
-  else
-    filename = name or ProjectService.MAIN
-  end
+  -- if state and state.buffer then
+  --   filename = state.buffer.filename
+  -- else
+  filename    = name or ProjectService.MAIN
+  -- end
   local fpath = p:get_path(filename)
   local ex    = FS.exists(fpath)
   local text
@@ -722,16 +801,26 @@ end
 --- @return EditorState?
 function ConsoleController:finish_edit()
   self.editor:save_state()
-  local name, newcontent = self.editor:close()
-  local ok, err = self:_writefile(name, newcontent)
+  self.editor:close()
+  local ok = true
+  local errs = {}
+  -- local bfs = self.editor:close()
+  -- for _, bc in ipairs(bfs) do
+  --   local name, newcontent = bc.name, bc.content
+  --   local bok, err = self:_writefile(name, newcontent)
+  --   if not bok then
+  --     ok = false
+  --     table.insert(errs, err)
+  --   end
+  -- end
   if ok then
     love.state.app_state = love.state.prev_state
     love.state.prev_state = nil
-    --- TODO clear bufferlist
-    return self.editor:get_state()
   else
-    print(err)
+    print(string.unlines(errs))
   end
+  self.buffers = {}
+  return self.editor:get_state()
 end
 
 --- Handlers ---
@@ -761,6 +850,11 @@ function ConsoleController:keypressed(k)
 
   local function terminal_test()
     local out = self.model.output
+    if love.state.app_state ~= 'ready'
+        or love.state.app_state ~= 'project_open'
+    then
+      return
+    end
     if not love.state.testing then
       love.state.testing = 'running'
       input:cancel()
@@ -817,7 +911,7 @@ function ConsoleController:keypressed(k)
         self.model.output:reset()
       end
       if love.DEBUG then
-        if k == 't' then
+        if Key.alt() and k == 't' then
           terminal_test()
           return
         end

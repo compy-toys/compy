@@ -3,7 +3,7 @@ math.randomseed(os.time())
 cw, ch = gfx.getDimensions()
 midx = cw / 2
 
-require("math")
+require("mathlib")
 examples = require("examples")
 
 size = 28

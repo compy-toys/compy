@@ -84,7 +84,6 @@ function BufferView:open(buffer)
 
   local ir = self:_get_end_range()
   self:_update_visible(ir)
-  if off > 0 then self:scroll('down', 1) end
 end
 
 --- @private
@@ -205,7 +204,7 @@ end
 
 --- @param ln integer
 function BufferView:scroll_to_line(ln)
-  local off = self.content.wrap_forward[ln][1]
+  local off = self.content.wrap_forward[ln][1] or 0
   self:scroll_to(off)
 end
 

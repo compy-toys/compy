@@ -26,6 +26,14 @@ function History:remember(input)
     if not self.index then
       self:append(input)
       return true
+    else
+      local entry = self:get(self.index)
+      local new = input or {}
+      local hist = string.unlines(entry)
+      local new_s = string.unlines(new)
+      if hist ~= new_s then
+        self:append(input)
+      end
     end
   end
   return false
@@ -97,8 +105,9 @@ function History:_get_entries()
 end
 
 --- For debug purposes, log content
+--- @private
 --- @param f function
-function History:_dump(f)
+function History:_dbgprint(f)
   local log = f or Log.debug
   local h = self:items()
   local t = table.map(h, function(t)
@@ -106,5 +115,5 @@ function History:_dump(f)
   end)
   local i = self.index or '-'
   local l = ' [' .. self:length() .. '] '
-  log(i .. l .. Debug.text_table(t, false, nil, 64)  )
+  log(i .. l .. Debug.text_table(t, false, nil, 64))
 end

@@ -47,6 +47,7 @@ local _C, _mode
 
 --- @param msg string
 local function user_error_handler(msg)
+  Log.debug('user error: ' .. msg)
   local err = LANG.get_call_error(msg) or ''
   local user_msg = messages.exec_error(err)
   _C:suspend_run(user_msg)
@@ -400,14 +401,14 @@ Controller = {
       local uup = Controller._userhandlers.update
       if user_update and uup
       then
-        if love.state.app_state == 'snapshot' then
-          gfx.captureScreenshot(function(img)
-            local snap = gfx.newImage(img)
-            View.snapshot = snap
-            C:suspend()
-          end)
-        end
         wrap(uup, dt)
+      end
+      if love.state.app_state == 'snapshot' then
+        gfx.captureScreenshot(function(img)
+          local snap = gfx.newImage(img)
+          View.snapshot = snap
+          C:suspend()
+        end)
       end
 
       if love.harmony then
@@ -537,7 +538,7 @@ Controller = {
     handlers.keypressed = function(k)
       --- Power shortcuts
       local function quickswitch()
-        if Key.ctrl() and k == 't' then
+        if Key.ctrl() and not Key.alt() and k == 't' then
           if love.state.app_state == 'running'
               or love.state.app_state == 'inspect'
               or love.state.app_state == 'project_open'
@@ -563,18 +564,22 @@ Controller = {
           if k == "pause" then
             C:suspend_run(messages.user_break)
           end
-          if Key.shift() then
-            -- Ensure the user can get back to the console
-            if k == "q" then
-              C:quit_project()
-            end
-            if k == "s" then
-              if love.state.app_state == 'running' then
-                C:stop_project_run()
-              elseif love.state.app_state == 'editor' then
+          if k == "q" then
+            C:quit_project()
+          end
+          if k == "s" then
+            if love.state.app_state == 'running' then
+              C:stop_project_run()
+            elseif love.state.app_state == 'editor' then
+              if Key.shift() then
+                C:finish_edit()
+              else
                 C:close_buffer()
               end
             end
+          end
+          if Key.shift() then
+            --- Ensure the user can get back to the console
             if k == "r" then
               C:reset()
             end

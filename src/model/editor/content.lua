@@ -30,6 +30,7 @@ end
 Chunk = class.create()
 
 --- @param lines str
+--- @param pos Range
 --- @return Chunk
 function Chunk.new(lines, pos)
   local ls = (function()

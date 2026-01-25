@@ -150,12 +150,12 @@ local function terse_array(a, skip)
   end
 end
 
---- @alias dumpstyle
+--- @alias tablestyle
 --- | 'lua'
 --- | 'json5'
 --- @param ast token[]?
 --- @param skip_lineinfo boolean?
---- @param style dumpstyle?
+--- @param style tablestyle?
 --- @return string
 local function terse_ast(ast, skip_lineinfo, style)
   if type(ast) ~= 'table' then
@@ -165,7 +165,7 @@ local function terse_ast(ast, skip_lineinfo, style)
 
   --- @param t table?
   --- @param omit any[]?
-  --- @param style dumpstyle?
+  --- @param style tablestyle?
   --- @param level integer?
   --- @param prev_seen table?
   --- @return string
@@ -320,7 +320,7 @@ Debug = {
     if type(t) == 'table' then
       local start = math.max(1, skip or 0)
       for i = start, #t do
-        local l = t[i]
+        local l = t[i] or ''
         local line = (function()
           if not no_ln then
             return string.format("#%02d: %s\n", i, text(l))
@@ -495,6 +495,7 @@ local error = function(...)
   printer(s)
 end
 local debug = function(...)
+  if love and not love.DEBUG then return end
   local args = { ... }
   local ts = string.format("%.3f ", os.clock())
   local s = annot(ts .. 'DEBUG ',
@@ -502,7 +503,7 @@ local debug = function(...)
   printer(s)
 end
 local once = function(...)
-  if not love.DEBUG then return end
+  if not love or not love.DEBUG then return end
   local args = { ... }
   local key = love.debug.once .. string.join(args, '')
   local kh = hash(key)

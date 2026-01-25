@@ -8,7 +8,7 @@ local class = require('util.class')
 --- @param cfg ViewConfig
 --- @param ctrl EditorController
 local function new(cfg, ctrl)
-  local ev = {
+  local self = {
     cfg = cfg,
     controller = ctrl,
     input = UserInputView(cfg, ctrl.input),
@@ -16,8 +16,8 @@ local function new(cfg, ctrl)
     search = SearchView(cfg, ctrl.search),
   }
   --- hook the view in the controller
-  ctrl:init_view(ev)
-  return ev
+  ctrl:init_view(self)
+  return self
 end
 
 --- @class EditorView : ViewBase

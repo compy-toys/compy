@@ -78,8 +78,9 @@ function Statusline:draw(status, start_y)
           midX - (8 * cf.fw),
           start_text.y + corr)
       end
-      local lw = font:getWidth(state) / 2
-      gfx.print((state or '???'),
+      local sl = state or '???'
+      local lw = font:getWidth(sl) / 2
+      gfx.print((sl),
         midX - lw, start_text.y)
       gfx.setColor(colors.fg)
     end
@@ -101,15 +102,19 @@ function Statusline:draw(status, start_y)
         end
         local more_b = morelabel(custom.buffer_more) .. ' '
         local more_i = morelabel(status.input_more) .. ' '
+        local name = custom.name .. ' '
 
         gfx.setColor(colors.fg)
-        local w_il  = gfx.getFont():getWidth(" 999:9999")
-        local w_br  = gfx.getFont():getWidth("B999 L999-999(99)")
-        local w_mb  = gfx.getFont():getWidth(" ↕↕ ")
-        local w_mi  = gfx.getFont():getWidth("  ↕↕ ")
+        local font = gfx.getFont()
+        local w_il  = font:getWidth(" 999:9999")
+        local w_br  = font:getWidth("B999 L999-999(99)")
+        local w_mb  = font:getWidth(" ↕↕ ")
+        local w_mi  = font:getWidth("  ↕↕ ")
         local s_mb  = endTextX - w_br - w_il - w_mi - w_mb
-        local cw_p  = gfx.getFont():getWidth(t_blp)
-        local cw_il = gfx.getFont():getWidth(t_ic)
+        local w_n  = font:getWidth(name)
+        local s_n  = s_mb - w_n - 5
+        local cw_p  = font:getWidth(t_blp)
+        local cw_il = font:getWidth(t_ic)
         local sxl   = endTextX - (cw_p + w_il + w_mi)
         local s_mi  = endTextX - w_il
 
@@ -146,6 +151,9 @@ function Statusline:draw(status, start_y)
         --- buffer more
         gfx.setColor(colors.fg)
         gfx.print(more_b, s_mb, start_text.y)
+        -- filename
+        gfx.setColor(Color[Color.white])
+        gfx.print(custom.name, s_n, start_text.y)
       else
         --- normal statusline
         local pos_c = ':' .. c.c

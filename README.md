@@ -31,7 +31,7 @@ a project must be selected first.
 | :---------------------------------------------------------------- | :-------------------------------------------- |
 | Clear terminal                                                    | <kbd>Ctrl</kbd>+<kbd>L</kbd>                  |
 | Stop project                                                      | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> |
-| Quit project (stop and close)                                     | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Q</kbd> |
+| Quit project (stop and close)                                     | <kbd>Ctrl</kbd>+<kbd>Q</kbd>                  |
 | Reset application to initial state                                | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> |
 | Reset project to initial state                                    | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd>   |
 | Exit application                                                  | <kbd>Ctrl</kbd>+<kbd>Esc</kbd>                |
@@ -59,6 +59,8 @@ a project must be selected first.
 | Move selection                                                    | <kbd>Ctrl</kbd>+<kbd>⇧</kbd>/<kbd>⇩</kbd>     |
 | Replace selection with input                                      | <kbd>Enter ⏎</kbd>                            |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _additionally_               |                                               |
+| Insert input contents before selection                            | <kbd>Ctrl</kbd>+<kbd>Enter ⏎</kbd>            |
+| Insert empty block before current (if input is empty)             | <kbd>Shift</kbd>+<kbd>Enter ⏎</kbd>           |
 | Delete selected block                                             | <kbd>Ctrl</kbd>+<kbd>Delete</kbd>             |
 | Delete selected block (if input is empty)                         | <kbd>Ctrl</kbd>+<kbd>Y</kbd>                  |
 | Wipe input                                                        | <kbd>Ctrl</kbd>+<kbd>W</kbd>                  |
@@ -70,7 +72,8 @@ a project must be selected first.
 | Scroll down by one line                                           | <kbd>Shift</kbd>+<kbd>PageDown</kbd>          |
 | Move selection to start                                           | <kbd>Ctrl</kbd>+<kbd>Home</kbd>               |
 | Move selecion to end                                              | <kbd>Ctrl</kbd>+<kbd>End</kbd>                |
-| Stop editor                                                       | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> |
+| Close editor buffer                                               | <kbd>Ctrl</kbd>+<kbd>S</kbd>                  |
+| Stop editor (close all buffers)                                   | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _move mode_                  |                                               |
 | Switch to moving ("pick up" selection)                            | <kbd>Ctrl</kbd>+<kbd>M</kbd>                  |
 | Move selection                                                    | <kbd>⇧</kbd>/<kbd>⇩</kbd>                     |
@@ -82,13 +85,13 @@ a project must be selected first.
 | Search definitions                                                | <kbd>Ctrl</kbd>+<kbd>F</kbd>                  |
 | Exit search                                                       | <kbd>Esc</kbd>                                |
 | Jump to selected definition                                       | <kbd>Enter ⏎</kbd>                            |
-| Edit required file / return to previous                           | <kbd>Ctrl</kbd>+<kbd>O</kbd>                  |
+| Edit required file under highlight                                | <kbd>Ctrl</kbd>+<kbd>O</kbd>                  |
 
 ## Projects
 
 A _project_ is a folder in the application's storage which
 contains at least a `main.lua` file. Projects can be loaded and
-ran. At any time, pressing <kbd>Ctrl-Shift-Q</kbd> quits and
+ran. At any time, pressing <kbd>Ctrl-Q</kbd> quits and
 returns to the console
 
 - `list_projects()`

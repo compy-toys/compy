@@ -69,7 +69,7 @@ function EditorController:open(name, content, save)
       return parser.trunc(code, self.model.cfg.view.fold_lines)
     end
   elseif is_md then
-    local mdEval = MdEval(name)
+    local mdEval = MdEval()
     hl = mdEval.highlighter
     self.input:set_eval(mdEval)
   else
@@ -85,7 +85,7 @@ function EditorController:open(name, content, save)
 end
 
 --- @private
-function EditorController:_dump_bufferlist()
+function EditorController:_print_bufferlist()
   for i, v in ipairs(self.model.buffers) do
     Log.debug(i, v.name)
   end
@@ -116,16 +116,15 @@ function EditorController:pop_buffer()
   bs:pop_front()
   local b = bs:first()
   self.view:get_current_buffer():open(b)
+  self:update_status()
 end
 
 function EditorController:close_buffer()
   local bs = self.model.buffers
   local n_buffers = bs:length()
   if n_buffers < 2 then
-    -- Log.debug('fin', n_buffers)
     self.console:finish_edit()
   else
-    -- Log.debug(':bd', n_buffers)
     self:pop_buffer()
   end
 end
@@ -235,13 +234,14 @@ function EditorController:restore_state(state)
   end
 end
 
---- @return string name
---- @return Dequeue content
+--- @return {name: string, content: string[]}[]
 function EditorController:close()
-  local buf = self:get_active_buffer()
   self.input:clear()
-  local content = buf:get_text_content()
-  return buf.name, content
+  local bfs = self.model:get_buffers_content()
+  self.model.buffers = Dequeue()
+  self.view.buffers = {}
+  --- TODO is this needed?
+  return bfs
 end
 
 --- @return BufferModel
@@ -269,9 +269,9 @@ function EditorController:_generate_status(sel)
   local ct = bufview.content_type
   if ct == 'lua' then
     local range = bufview.content:get_block_app_pos(sel)
-    cs = CustomStatus(ct, len, more, sel, m, range)
+    cs = CustomStatus(buffer.name, ct, len, more, sel, m, range)
   else
-    cs = CustomStatus(ct, len, more, sel, m)
+    cs = CustomStatus(buffer.name, ct, len, more, sel, m)
   end
 
   return cs
@@ -329,10 +329,8 @@ function EditorController:_handle_submit(go)
       local sel = buf:get_selection()
       local block = buf:get_content():get(sel)
       if not block then return end
-      --- TODO: why did I do this?
-      -- local ln = block.pos.start
-      -- if ln then go({ Empty(ln) }) end
     else
+      local _, raw_chunks = buf.chunker(raw, true)
       local pretty = buf.printer(raw)
       if pretty then
         inter:set_text(pretty)
@@ -343,6 +341,16 @@ function EditorController:_handle_submit(go)
       local ok, res = inter:evaluate()
       local _, chunks = buf.chunker(pretty, true)
       if ok then
+        if #chunks < #raw_chunks then
+          local rc = raw_chunks
+          if rc[1].tag == 'empty' then
+            table.insert(chunks, 1, Empty(0))
+          end
+          if rc[#rc].tag == 'empty' then
+            local li = chunks[#chunks].pos.fin
+            table.insert(chunks, Empty(li + 1))
+          end
+        end
         go(chunks)
       else
         local eval_err = res
@@ -489,16 +497,23 @@ function EditorController:_normal_mode_keys(k)
   local buf            = self:get_active_buffer()
 
   local function newline()
-    if not Key.ctrl() and Key.shift() and Key.is_enter(k) then
-      buf:insert_newline()
-      self:save(buf)
-      self.view:refresh()
-      block_input()
+    if Key.is_enter(k) then
+      --- insert empty block if input is empty
+      if is_empty
+          and (Key.shift() or Key.ctrl())
+          and not Key.alt() then
+        buf:insert_newline()
+        self:save(buf)
+        self.view:refresh()
+        block_input()
+      end
     end
   end
 
   local function delete_block()
+    local t = string.unlines(buf:get_selected_text())
     buf:delete_selected_text()
+    love.system.setClipboardText(t)
     self:save(buf)
     self.view:refresh()
   end
@@ -546,9 +561,9 @@ function EditorController:_normal_mode_keys(k)
   end
 
   if is_empty then
-    newline()
     copycut()
   end
+  newline()
 
   paste_k()
 
@@ -573,29 +588,53 @@ function EditorController:_normal_mode_keys(k)
 
   --- handlers
   local function submit()
-    if not Key.ctrl() and not Key.shift() and Key.is_enter(k) then
-      local bufv = self.view:get_current_buffer()
-      local function go(newtext)
+    local bufv = self.view:get_current_buffer()
+    local function replace(newtext)
+      if bufv:is_selection_visible() then
+        if buf:loaded_is_sel(true) then
+          local _, n = buf:replace_content(newtext)
+          buf:clear_loaded()
+          self:save(buf)
+          input:clear()
+          self.view:refresh()
+          self:_move_sel('down', n)
+          load_selection()
+          self:update_status()
+        else
+          buf:select_loaded()
+          bufv:follow_selection()
+        end
+      else
+        bufv:follow_selection()
+      end
+    end
+
+    if Key.ctrl()
+        and not Key.shift()
+        and not Key.alt()
+        and Key.is_enter(k) then
+      local function add(newtext)
         if bufv:is_selection_visible() then
-          if buf:loaded_is_sel(true) then
-            local _, n = buf:replace_selected_text(newtext)
-            buf:clear_loaded()
-            self:save(buf)
-            input:clear()
-            self.view:refresh()
-            self:_move_sel('down', n)
-            load_selection()
-            self:update_status()
-          else
-            buf:select_loaded()
-            bufv:follow_selection()
-          end
+          local sel = buf:get_selection()
+          local _, n = buf:insert_content(newtext, sel)
+          self:save(buf)
+          self.view:refresh()
+          self:_move_sel('down', n)
+          buf:clear_loaded()
+          self:update_status()
         else
           bufv:follow_selection()
         end
       end
 
-      self:_handle_submit(go)
+      self:_handle_submit(add)
+    end
+
+    if not Key.ctrl()
+        and not Key.shift()
+        and not Key.alt()
+        and Key.is_enter(k) then
+      self:_handle_submit(replace)
     end
   end
   local function load()
@@ -666,7 +705,7 @@ function EditorController:_normal_mode_keys(k)
     end
 
     -- step into
-    if love.DEBUG and Key.ctrl() then
+    if Key.ctrl() then
       if k == "o" then
         self:follow_require()
       end

@@ -1,6 +1,7 @@
 local class = require('util.class')
 
 --- @class CustomStatus table
+--- @field name string
 --- @field content_type ContentType
 --- @field buflen integer
 --- @field buffer_more More
@@ -8,8 +9,9 @@ local class = require('util.class')
 --- @field mode EditorMode
 --- @field range Range?
 CustomStatus = class.create(
-  function(ct, len, more, sel, mode, range)
+  function(name, ct, len, more, sel, mode, range)
     return {
+      name = name,
       content_type = ct,
       buflen = len,
       buffer_more = more,
